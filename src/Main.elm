@@ -3,7 +3,9 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Events
 import List
-import Array exposing (Array)
+import Player
+import Equipment
+import Equipment.Lists
 
 
 main =
@@ -20,26 +22,13 @@ main =
 
 
 type alias Model =
-    { cashLeft : Int
-    , equipment : List Equipment
+    { player1 : Player.Player
     }
-
-
-type Equipment
-    = Armor
-    | Helmet
-    | AK47
-
-
-allAvailableEquipment : Array Equipment
-allAvailableEquipment =
-    Array.fromList
-        [ Armor, Helmet, AK47 ]
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 0 [ Armor ], Cmd.none )
+    ( Model (Player.Player 0 Nothing Nothing Nothing [] []), Cmd.none )
 
 
 
@@ -47,14 +36,18 @@ init =
 
 
 type Msg
-    = Purchase Equipment
+    = Purchase Equipment.Primary
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Purchase item ->
-            ( { model | equipment = model.equipment ++ [ item ] }, Cmd.none )
+            let
+                player1 =
+                    model.player1
+            in
+                ( { model | player1 = { player1 | primary = Just item } }, Cmd.none )
 
 
 
@@ -77,21 +70,15 @@ view model =
             [ a ]
     in
         Html.div []
-            [ Html.text (toString model.cashLeft)
+            [ Html.text (toString model.player1.money)
+            , Html.ul [] [ Html.li [] <| enlist <| Html.text <| toString model.player1.primary ]
             , Html.ul []
                 (List.map
-                    (Html.li [] << enlist << Html.text << toString)
-                    model.equipment
-                )
-            , Html.ul []
-                (Array.toList
-                    (Array.map
-                        (\e ->
-                            Html.li []
-                                [ Html.button [ Html.Events.onClick (Purchase e) ] [ Html.text ("Purchase " ++ toString e) ]
-                                ]
-                        )
-                        allAvailableEquipment
+                    (\e ->
+                        Html.li []
+                            [ Html.button [ Html.Events.onClick (Purchase e) ] [ Html.text ("Purchase " ++ toString e) ]
+                            ]
                     )
+                    Equipment.Lists.rifle
                 )
             ]
