@@ -5,6 +5,7 @@ import Html.Events
 import List
 import Player
 import Equipment
+import BuyMenu
 
 
 main =
@@ -36,6 +37,7 @@ init =
 
 type Msg
     = Player1Msg Player.Msg
+    | NoMsg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -47,6 +49,9 @@ update msg model =
                     model.player1
             in
                 ( { model | player1 = Player.update msg player1 }, Cmd.none )
+
+        NoMsg ->
+            ( model, Cmd.none )
 
 
 
@@ -64,4 +69,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    Player.view Player1Msg model.player1
+    Html.div []
+        [ BuyMenu.view NoMsg 6
+        , Player.view Player1Msg model.player1
+        ]
