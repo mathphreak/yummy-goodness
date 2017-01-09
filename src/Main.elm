@@ -5,7 +5,6 @@ import Html.Events
 import List
 import Player
 import Equipment
-import Equipment.Lists
 
 
 main =
@@ -28,7 +27,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Player.Player 0 Nothing Nothing Nothing [] []), Cmd.none )
+    ( Model (Player.emptyPlayer), Cmd.none )
 
 
 
@@ -36,18 +35,18 @@ init =
 
 
 type Msg
-    = Purchase Equipment.Primary
+    = Player1Msg Player.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Purchase item ->
+        Player1Msg msg ->
             let
                 player1 =
                     model.player1
             in
-                ( { model | player1 = { player1 | primary = Just item } }, Cmd.none )
+                ( { model | player1 = Player.update msg player1 }, Cmd.none )
 
 
 
@@ -65,20 +64,4 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    let
-        enlist a =
-            [ a ]
-    in
-        Html.div []
-            [ Html.text (toString model.player1.money)
-            , Html.ul [] [ Html.li [] <| enlist <| Html.text <| toString model.player1.primary ]
-            , Html.ul []
-                (List.map
-                    (\e ->
-                        Html.li []
-                            [ Html.button [ Html.Events.onClick (Purchase e) ] [ Html.text ("Purchase " ++ toString e) ]
-                            ]
-                    )
-                    Equipment.Lists.rifle
-                )
-            ]
+    Player.view Player1Msg model.player1
