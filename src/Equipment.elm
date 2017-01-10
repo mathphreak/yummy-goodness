@@ -4,7 +4,7 @@
 module Equipment exposing (..)
 
 
-type Team
+type Side
     = CT
     | T
 
@@ -394,7 +394,7 @@ cost e =
             300
 
 
-teamRestriction : Equipment -> Maybe Team
+teamRestriction : Equipment -> Maybe Side
 teamRestriction e =
     case e of
         Glock ->

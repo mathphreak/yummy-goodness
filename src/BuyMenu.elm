@@ -85,7 +85,7 @@ wedge count idx top bottom msg enabled =
             ]
 
 
-center : Maybe msg -> Equipment.Team -> Html msg
+center : Maybe msg -> Equipment.Side -> Html msg
 center backMsg team =
     let
         teamColor =
@@ -118,7 +118,7 @@ center backMsg team =
             )
 
 
-viewSix : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Team -> List Equipment -> Html msg
+viewSix : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> List Equipment -> Html msg
 viewSix backMsg msg canPurchase team inv =
     let
         buildItem i e =
@@ -149,7 +149,7 @@ viewSix backMsg msg canPurchase team inv =
             )
 
 
-viewFour : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Team -> List Equipment -> Html msg
+viewFour : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> List Equipment -> Html msg
 viewFour backMsg msg canPurchase team inv =
     let
         buildItem i e =
@@ -179,7 +179,7 @@ viewFour backMsg msg canPurchase team inv =
             )
 
 
-viewSubmenu : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Team -> List Equipment -> Html msg
+viewSubmenu : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> List Equipment -> Html msg
 viewSubmenu backMsg msg canPurchase team inv =
     if (List.length inv) > 4 then
         (viewSix backMsg msg canPurchase team inv)
@@ -187,7 +187,7 @@ viewSubmenu backMsg msg canPurchase team inv =
         (viewFour backMsg msg canPurchase team inv)
 
 
-viewMenu : (Equipment.Submenu -> msg) -> Equipment.Team -> Html msg
+viewMenu : (Equipment.Submenu -> msg) -> Equipment.Side -> Html msg
 viewMenu msg team =
     let
         teamColor =

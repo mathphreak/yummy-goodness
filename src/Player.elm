@@ -1,6 +1,6 @@
 module Player exposing (..)
 
-import Equipment exposing (Equipment, Team, Submenu)
+import Equipment exposing (Equipment, Side, Submenu)
 import Html exposing (Html)
 import Html.Events
 import String
@@ -12,7 +12,7 @@ import BuyMenu
 
 type alias Player =
     { money : Int
-    , team : Team
+    , team : Side
     , secondary : Maybe Equipment
     , primary : Maybe Equipment
     , gear : List Equipment
@@ -21,8 +21,18 @@ type alias Player =
     }
 
 
-emptyPlayer =
-    Player 10000 Equipment.CT Nothing Nothing [] [] Nothing
+newPlayer : Side -> Player
+newPlayer side =
+    let
+        pistol =
+            case side of
+                Equipment.CT ->
+                    Equipment.USPS
+
+                Equipment.T ->
+                    Equipment.Glock
+    in
+        Player 800 side (Just pistol) Nothing [] [] Nothing
 
 
 

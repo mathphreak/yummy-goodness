@@ -3,9 +3,9 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Events
 import List
-import Player
+import Player exposing (Player)
 import Equipment
-import BuyMenu
+import Team exposing (Team)
 
 
 main =
@@ -22,13 +22,14 @@ main =
 
 
 type alias Model =
-    { player1 : Player.Player
+    { us : Team
+    , them : Team
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Player.emptyPlayer), Cmd.none )
+    ( Model Team.ctTeam Team.tTeam, Cmd.none )
 
 
 
@@ -36,22 +37,18 @@ init =
 
 
 type Msg
-    = Player1Msg Player.Msg
-    | NoMsg
+    = UsMsg Team.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Player1Msg msg ->
+        UsMsg msg ->
             let
-                player1 =
-                    model.player1
+                us =
+                    model.us
             in
-                ( { model | player1 = Player.update msg player1 }, Cmd.none )
-
-        NoMsg ->
-            ( model, Cmd.none )
+                ( { model | us = Team.update msg us }, Cmd.none )
 
 
 
@@ -70,5 +67,5 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Player.view Player1Msg model.player1
+        [ Team.view UsMsg model.us
         ]
