@@ -22,7 +22,7 @@ type alias Player =
 
 
 emptyPlayer =
-    Player 0 Equipment.T Nothing Nothing [] [] Nothing
+    Player 0 Equipment.CT Nothing Nothing [] [] Nothing
 
 
 
@@ -59,16 +59,6 @@ update msg player =
 -- VIEW
 
 
-type alias Options =
-    { pistols : List Equipment
-    , heavy : List Equipment
-    , smgs : List Equipment
-    , rifles : List Equipment
-    , gear : List Equipment
-    , grenades : List Equipment
-    }
-
-
 playerCanUseEquipment : Player -> Equipment -> Bool
 playerCanUseEquipment p e =
     case (Equipment.teamRestriction e) of
@@ -79,36 +69,6 @@ playerCanUseEquipment p e =
             True
 
 
-options : Player -> Options
-options player =
-    let
-        pistols =
-            .pistols Equipment.lists
-                |> List.filter (playerCanUseEquipment player)
-
-        heavy =
-            .heavy Equipment.lists
-                |> List.filter (playerCanUseEquipment player)
-
-        smgs =
-            .smgs Equipment.lists
-                |> List.filter (playerCanUseEquipment player)
-
-        rifles =
-            .rifles Equipment.lists
-                |> List.filter (playerCanUseEquipment player)
-
-        gear =
-            .gear Equipment.lists
-                |> List.filter (playerCanUseEquipment player)
-
-        grenades =
-            .grenades Equipment.lists
-                |> List.filter (playerCanUseEquipment player)
-    in
-        Options pistols heavy smgs rifles gear grenades
-
-
 buyMenuFor : (Msg -> msg) -> Player -> Html msg
 buyMenuFor msg player =
     case player.submenu of
@@ -116,7 +76,7 @@ buyMenuFor msg player =
             BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a)) player.team
 
         Just submenu ->
-            BuyMenu.viewSubmenu (\a -> msg <| Purchase a) player.team ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
+            BuyMenu.viewSubmenu (msg <| MenuSelect Nothing) (\a -> msg <| Purchase a) player.team ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
 
 
 view : (Msg -> msg) -> Player -> Html msg

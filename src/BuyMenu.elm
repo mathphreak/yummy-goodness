@@ -63,15 +63,48 @@ wedge count idx top bottom msg =
                 Nothing ->
                     []
     in
-        a ([ class "wedge" ] ++ eventAttributes)
+        a ([ class "wedge link" ] ++ eventAttributes)
             [ Svg.path [ d ("M 50 50 L " ++ startX ++ " " ++ startY ++ " A 50 50 0 0 0 " ++ endX ++ " " ++ endY ++ " L 50 50 z"), fill "black" ] []
             , text_ [ x midX, y midY1, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text top ]
             , text_ [ x midX, y midY2, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text bottom ]
             ]
 
 
-viewSix : (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
-viewSix msg team inv =
+center : Maybe msg -> Equipment.Team -> Html msg
+center backMsg team =
+    let
+        teamColor =
+            if team == Equipment.CT then
+                "#0000DD"
+            else
+                "#DD00AA"
+
+        clickCenterAction =
+            case backMsg of
+                Nothing ->
+                    []
+
+                Just msg ->
+                    [ class "link", onClick msg ]
+
+        centerLabel =
+            case backMsg of
+                Nothing ->
+                    []
+
+                _ ->
+                    [ text_ [ x "50", y "50", fill "white", textAnchor "middle", dominantBaseline "middle", fontSize "4px" ] [ text "BACK" ] ]
+    in
+        a clickCenterAction
+            ([ circle [ cx "50", cy "50", r "10", fill "#FFFFFF" ] []
+             , circle [ cx "50", cy "50", r "7.5", fill teamColor ] []
+             ]
+                ++ centerLabel
+            )
+
+
+viewSix : msg -> (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
+viewSix backMsg msg team inv =
     let
         buildItem i e =
             { index = (i + 1), cost = "$" ++ (toString (Equipment.cost e)), name = Equipment.toString e, action = Just (msg e) }
@@ -85,26 +118,19 @@ viewSix msg team inv =
 
         wedgeFor item =
             wedge 6 item.index item.cost item.name item.action
-
-        teamColor =
-            if team == Equipment.CT then
-                "#0000DD"
-            else
-                "#DD00AA"
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
             ((List.map wedgeFor items)
                 ++ [ lineAtAngle (pi / 6)
                    , lineAtAngle (3 * pi / 6)
                    , lineAtAngle (5 * pi / 6)
-                   , circle [ cx "50", cy "50", r "10", fill "#FFFFFF" ] []
-                   , circle [ cx "50", cy "50", r "7.5", fill teamColor ] []
+                   , center (Just backMsg) team
                    ]
             )
 
 
-viewFour : (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
-viewFour msg team inv =
+viewFour : msg -> (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
+viewFour backMsg msg team inv =
     let
         buildItem i e =
             { index = (i + 1), cost = "$" ++ (toString (Equipment.cost e)), name = Equipment.toString e, action = Just (msg e) }
@@ -118,29 +144,22 @@ viewFour msg team inv =
 
         wedgeFor item =
             wedge 4 item.index item.cost item.name item.action
-
-        teamColor =
-            if team == Equipment.CT then
-                "#0000DD"
-            else
-                "#DD00AA"
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
             ((List.map wedgeFor items)
                 ++ [ lineAtAngle (pi / 4)
                    , lineAtAngle (3 * pi / 4)
-                   , circle [ cx "50", cy "50", r "10", fill "#FFFFFF" ] []
-                   , circle [ cx "50", cy "50", r "7.5", fill teamColor ] []
+                   , center (Just backMsg) team
                    ]
             )
 
 
-viewSubmenu : (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
-viewSubmenu msg team inv =
+viewSubmenu : msg -> (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
+viewSubmenu backMsg msg team inv =
     if (List.length inv) > 4 then
-        (viewSix msg team inv)
+        (viewSix backMsg msg team inv)
     else
-        (viewFour msg team inv)
+        (viewFour backMsg msg team inv)
 
 
 viewMenu : (Equipment.Submenu -> msg) -> Equipment.Team -> Html msg
@@ -162,6 +181,5 @@ viewMenu msg team =
             , lineAtAngle (pi / 6)
             , lineAtAngle (3 * pi / 6)
             , lineAtAngle (5 * pi / 6)
-            , circle [ cx "50", cy "50", r "10", fill "#FFFFFF" ] []
-            , circle [ cx "50", cy "50", r "7.5", fill teamColor ] []
+            , center Nothing team
             ]
