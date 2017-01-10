@@ -70,6 +70,5 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ BuyMenu.view NoMsg 6
-        , Player.view Player1Msg model.player1
+        [ Player.view Player1Msg model.player1
         ]

@@ -1,9 +1,10 @@
 module Player exposing (..)
 
-import Equipment exposing (Equipment, Team)
+import Equipment exposing (Equipment, Team, Submenu)
 import Html exposing (Html)
 import Html.Events
 import String
+import BuyMenu
 
 
 -- MODEL
@@ -16,11 +17,12 @@ type alias Player =
     , primary : Maybe Equipment
     , gear : List Equipment
     , grenades : List Equipment
+    , submenu : Maybe Submenu
     }
 
 
 emptyPlayer =
-    Player 0 Equipment.CT Nothing Nothing [] []
+    Player 0 Equipment.CT Nothing Nothing [] [] Nothing
 
 
 
@@ -29,6 +31,7 @@ emptyPlayer =
 
 type Msg
     = Purchase Equipment
+    | MenuSelect (Maybe Submenu)
 
 
 update : Msg -> Player -> Player
@@ -37,16 +40,19 @@ update msg player =
         Purchase item ->
             case (Equipment.slot item) of
                 Equipment.Primary ->
-                    { player | primary = Just item }
+                    { player | primary = Just item, submenu = Nothing }
 
                 Equipment.Secondary ->
-                    { player | secondary = Just item }
+                    { player | secondary = Just item, submenu = Nothing }
 
-                Equipment.Gear ->
-                    { player | gear = item :: player.gear }
+                Equipment.GearSlot ->
+                    { player | gear = item :: player.gear, submenu = Nothing }
 
                 Equipment.Grenade ->
-                    { player | grenades = item :: player.grenades }
+                    { player | grenades = item :: player.grenades, submenu = Nothing }
+
+        MenuSelect sm ->
+            { player | submenu = sm }
 
 
 
@@ -103,20 +109,14 @@ options player =
         Options pistols heavy smgs rifles gear grenades
 
 
-purchaseButton : (Msg -> msg) -> Equipment -> Html msg
-purchaseButton msg e =
-    Html.button
-        [ Html.Events.onClick (msg (Purchase e)) ]
-        [ Html.text ("Purchase " ++ Equipment.toString e) ]
+buyMenuFor : (Msg -> msg) -> Player -> Html msg
+buyMenuFor msg player =
+    case player.submenu of
+        Nothing ->
+            BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a))
 
-
-purchaseSubmenu : (Msg -> msg) -> List Equipment -> Html msg
-purchaseSubmenu msg l =
-    Html.ul []
-        (List.map
-            (\e -> Html.li [] [ purchaseButton msg e ])
-            l
-        )
+        Just submenu ->
+            BuyMenu.viewSubmenu (\a -> msg <| Purchase a) ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
 
 
 view : (Msg -> msg) -> Player -> Html msg
@@ -129,10 +129,5 @@ view msg player =
             , Html.li [] [ Html.text (player.gear |> List.map Equipment.toString |> String.join ", ") ]
             , Html.li [] [ Html.text (player.grenades |> List.map Equipment.toString |> String.join ", ") ]
             ]
-        , purchaseSubmenu msg (.pistols (options player))
-        , purchaseSubmenu msg (.heavy (options player))
-        , purchaseSubmenu msg (.smgs (options player))
-        , purchaseSubmenu msg (.rifles (options player))
-        , purchaseSubmenu msg (.gear (options player))
-        , purchaseSubmenu msg (.grenades (options player))
+        , buyMenuFor msg player
         ]

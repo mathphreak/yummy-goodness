@@ -9,6 +9,15 @@ type Team
     | T
 
 
+type Submenu
+    = Pistols
+    | Heavy
+    | SMGs
+    | Rifles
+    | GearMenu
+    | Grenades
+
+
 type Equipment
     = Glock
     | USPS
@@ -54,7 +63,7 @@ type Equipment
 type Slot
     = Primary
     | Secondary
-    | Gear
+    | GearSlot
     | Grenade
 
 
@@ -62,11 +71,11 @@ lists =
     { pistols =
         [ Glock
         , USPS
-        , P250
-        , Deagle
         , Berettas
+        , P250
         , Tec9
         , FiveSeven
+        , Deagle
         ]
     , heavy =
         [ Nova
@@ -110,31 +119,37 @@ lists =
         , Flash
         , Smoke
         ]
-    , primary =
-        [ Nova
-        , XM1014
-        , SawedOff
-        , MAG7
-        , M249
-        , Negev
-        , MAC10
-        , MP9
-        , MP7
-        , UMP45
-        , PPBizon
-        , P90
-        , GalilAR
-        , FAMAS
-        , AK47
-        , M4A4
-        , SSG08
-        , SG553
-        , AUG
-        , AWP
-        , G3SG1
-        , SCAR20
+    , submenus =
+        [ Pistols
+        , Heavy
+        , SMGs
+        , Rifles
+        , GearMenu
+        , Grenades
         ]
     }
+
+
+listFor : Submenu -> List Equipment
+listFor m =
+    case m of
+        Pistols ->
+            lists.pistols
+
+        Heavy ->
+            lists.heavy
+
+        SMGs ->
+            lists.smgs
+
+        Rifles ->
+            lists.rifles
+
+        GearMenu ->
+            lists.gear
+
+        Grenades ->
+            lists.grenades
 
 
 toString : Equipment -> String
@@ -262,10 +277,10 @@ cost : Equipment -> Int
 cost e =
     case e of
         Glock ->
-            0
+            200
 
         USPS ->
-            0
+            200
 
         P250 ->
             300
@@ -468,16 +483,16 @@ slot e =
             Secondary
 
         Vest ->
-            Gear
+            GearSlot
 
         VestHelmet ->
-            Gear
+            GearSlot
 
         Zeus ->
-            Gear
+            GearSlot
 
         Defuse ->
-            Gear
+            GearSlot
 
         Molotov ->
             Grenade
