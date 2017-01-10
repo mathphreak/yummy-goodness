@@ -188,7 +188,9 @@ view onClick selected player =
                 [ Html.strong [] [ Html.text player.name ]
                 , Html.text (", $" ++ toString player.money)
                 ]
-            , Html.p []
-                [ Html.text (inventory |> List.map Equipment.toString |> String.join ", ")
-                ]
+            , Html.p [ Html.Attributes.class "inventory" ]
+                (inventory
+                    |> List.map (\i -> Html.span [] [ Html.text (Equipment.toString i) ])
+                    |> List.intersperse (Html.text ", ")
+                )
             ]
