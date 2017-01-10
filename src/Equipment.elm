@@ -90,8 +90,8 @@ lists =
         , MP9
         , MP7
         , UMP45
-        , PPBizon
         , P90
+        , PPBizon
         ]
     , rifles =
         [ GalilAR
@@ -115,8 +115,8 @@ lists =
         [ Molotov
         , Incendiary
         , Decoy
-        , HENade
         , Flash
+        , HENade
         , Smoke
         ]
     , submenus =
@@ -243,16 +243,16 @@ toString e =
             "Negev"
 
         Vest ->
-            "Vest"
+            "Kevlar"
 
         VestHelmet ->
-            "Vest + Helmet"
+            "Kevlar + Helmet"
 
         Zeus ->
             "Zeus x27"
 
         Defuse ->
-            "Defuse kit"
+            "Defuse Kit"
 
         Molotov ->
             "Molotov"

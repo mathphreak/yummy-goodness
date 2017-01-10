@@ -22,7 +22,7 @@ type alias Player =
 
 
 emptyPlayer =
-    Player 0 Equipment.CT Nothing Nothing [] [] Nothing
+    Player 0 Equipment.T Nothing Nothing [] [] Nothing
 
 
 
@@ -113,10 +113,10 @@ buyMenuFor : (Msg -> msg) -> Player -> Html msg
 buyMenuFor msg player =
     case player.submenu of
         Nothing ->
-            BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a))
+            BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a)) player.team
 
         Just submenu ->
-            BuyMenu.viewSubmenu (\a -> msg <| Purchase a) ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
+            BuyMenu.viewSubmenu (\a -> msg <| Purchase a) player.team ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
 
 
 view : (Msg -> msg) -> Player -> Html msg
