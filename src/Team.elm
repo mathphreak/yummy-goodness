@@ -1,5 +1,13 @@
-module Team exposing (..)
+module Team
+    exposing
+        ( Team
+        , buildTeam
+        , Msg(PlayerMessage)
+        , update
+        , view
+        )
 
+import Array exposing (Array)
 import Player exposing (Player, newPlayer)
 import Equipment
 import Html exposing (Html)
@@ -10,26 +18,18 @@ import Html.Attributes exposing (..)
 
 
 type alias Team =
-    { players : List Player
+    { players : Array Player
     }
 
 
-buildTeam : Equipment.Side -> List String -> Team
+buildTeam : Equipment.Side -> Array String -> Team
 buildTeam side names =
     let
         players =
             names
-                |> List.map (newPlayer side)
+                |> Array.map (newPlayer side)
     in
         Team players
-
-
-getPlayer : Int -> Team -> Maybe Player
-getPlayer i team =
-    team.players
-        |> List.take (i + 1)
-        |> List.drop i
-        |> List.head
 
 
 
@@ -45,18 +45,14 @@ update msg team =
     case msg of
         PlayerMessage idx msg ->
             let
-                oldPlayers =
-                    team.players
-
-                process i player =
-                    if i == idx then
-                        Player.update msg player
-                    else
-                        player
-
                 newPlayers =
-                    oldPlayers
-                        |> List.indexedMap process
+                    case (Array.get idx team.players) of
+                        Nothing ->
+                            team.players
+
+                        Just old ->
+                            team.players
+                                |> Array.set idx (Player.update msg old)
             in
                 { team | players = newPlayers }
 
@@ -72,4 +68,4 @@ view msg selected team =
             Player.view (msg |> Maybe.map (\m -> m i)) (selected == Just i) p
     in
         Html.div [ class "team" ]
-            (List.indexedMap viewPlayer team.players)
+            (Array.toList (Array.indexedMap viewPlayer team.players))

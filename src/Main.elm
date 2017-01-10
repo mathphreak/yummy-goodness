@@ -3,13 +3,14 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
-import List
+import Array exposing (Array)
 import Player exposing (Player)
 import Equipment
 import Team exposing (Team)
 import Random
 import BotNames
 import BuyMenu
+import Simulation
 
 
 main =
@@ -34,7 +35,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Team []) (Team []) Nothing, Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool) )
+    ( Model (Team Array.empty) (Team Array.empty) Nothing, Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool) )
 
 
 
@@ -42,9 +43,11 @@ init =
 
 
 type Msg
-    = RngLoad ( List String, Bool )
+    = RngLoad ( Array String, Bool )
     | UsMsg Team.Msg
     | SelectPlayer Int
+    | BeginSimulation
+    | EndSimulation ( Team, Team )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,7 +62,7 @@ update msg model =
                         Equipment.T
 
                 ourNames =
-                    List.take 5 names
+                    Array.slice 0 5 names
 
                 theirSide =
                     if weAreCT then
@@ -68,7 +71,7 @@ update msg model =
                         Equipment.CT
 
                 theirNames =
-                    List.drop 5 names
+                    Array.slice 5 10 names
             in
                 ( Model (Team.buildTeam ourSide ourNames) (Team.buildTeam theirSide theirNames) Nothing
                 , Cmd.none
@@ -83,6 +86,12 @@ update msg model =
 
         SelectPlayer i ->
             ( { model | selectedPlayer = Just i }, Cmd.none )
+
+        BeginSimulation ->
+            ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them )) )
+
+        EndSimulation ( us, them ) ->
+            ( { model | us = us, them = them }, Cmd.none )
 
 
 
@@ -104,7 +113,7 @@ view model =
         menu =
             case model.selectedPlayer of
                 Just i ->
-                    case (Team.getPlayer i model.us) of
+                    case (Array.get i model.us.players) of
                         Just p ->
                             Player.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
 
@@ -126,4 +135,5 @@ view model =
                     , Team.view Nothing Nothing model.them
                     ]
                 ]
+            , Html.button [ Html.Attributes.type_ "button", Html.Events.onClick BeginSimulation ] [ Html.text "Simulate!" ]
             ]

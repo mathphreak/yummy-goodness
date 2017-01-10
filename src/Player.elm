@@ -1,4 +1,13 @@
-module Player exposing (..)
+module Player
+    exposing
+        ( Player
+        , newPlayer
+        , dead
+        , Msg
+        , update
+        , buyMenuFor
+        , view
+        )
 
 import Equipment exposing (Equipment, Side, Submenu)
 import Html exposing (Html)
@@ -35,6 +44,20 @@ newPlayer side name =
                     Equipment.Glock
     in
         Player 800 side (Just pistol) Nothing [] [] Nothing name
+
+
+dead : Player -> Player
+dead p =
+    let
+        pistol =
+            case p.team of
+                Equipment.CT ->
+                    Equipment.USPS
+
+                Equipment.T ->
+                    Equipment.Glock
+    in
+        { p | secondary = Just pistol, primary = Nothing, gear = [], grenades = [] }
 
 
 

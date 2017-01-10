@@ -13,14 +13,15 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 
 ## FEATURES
 
-- Players have proper inventory
-- Players are on teams
-- Buy things with the actual CS:GO buy menu
-- Buy things for each player
+- Players have proper inventory (UI: ☹️)
+- Players are on teams (UI: ☹️)
+- Buy things with the actual CS:GO buy menu (UI: 🙂)
+- Buy things for each player (UI: ☹️)
+- Simulate rounds of game (UI: ☹️)
+    - Each round, one player dies and one player gets $3000
 
 ## TODO
 
-- Simulate rounds of game
 - Make players drop weapons
 - Make enemies buy things too
 - Explain some things
@@ -28,3 +29,9 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Don't show enemy equipment
     - Time limit for purchases
     - Players don't actually listen
+- Simulate rounds of game
+    - Round win/loss exists
+    - Weapon kill rewards are a thing
+    - Weapon damage exists
+    - Armor is a thing
+    - Matchups are better
