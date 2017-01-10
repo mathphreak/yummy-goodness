@@ -18,10 +18,12 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
 - Buy things for each player (UI: ☹️)
 - Simulate rounds of game (UI: ☹️)
-    - Each round, one player dies and one player gets $3000
+    - In each matchup, one player dies and one player gets $3000
+    - This happens five times per round but skips if one player is dead
 
 ## TODO
 
+- Grey out submenu if nothing inside is affordable
 - Make players drop weapons
 - Make enemies buy things too
 - Explain some things

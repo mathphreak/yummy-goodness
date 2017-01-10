@@ -64,9 +64,26 @@ breakState ( simUs, simThem ) =
         ( breakTeam simUs, breakTeam simThem )
 
 
+playerIfAlive : SimulatedPlayer -> Maybe SimulatedPlayer
+playerIfAlive p =
+    if p.health > 0 then
+        Just p
+    else
+        Nothing
+
+
 getMatchup : SimulationState -> ( Int, Int ) -> Maybe SimulatedMatchup
 getMatchup ( ourTeam, theirTeam ) ( u, t ) =
-    Maybe.map2 (,) (Array.get u ourTeam.players) (Array.get t theirTeam.players)
+    let
+        me =
+            Array.get u ourTeam.players
+                |> Maybe.andThen playerIfAlive
+
+        you =
+            Array.get t theirTeam.players
+                |> Maybe.andThen playerIfAlive
+    in
+        Maybe.map2 (,) me you
 
 
 simulateMatchup : SimulatedMatchup -> Generator SimulatedMatchup
@@ -141,4 +158,8 @@ simulate : ( Team, Team ) -> Generator ( Team, Team )
 simulate init =
     makeState init
         |> simulateStep
+        |> andThen simulateStep
+        |> andThen simulateStep
+        |> andThen simulateStep
+        |> andThen simulateStep
         |> map breakState
