@@ -22,8 +22,8 @@ lineAtAngle angle =
         []
 
 
-wedge : Int -> Int -> String -> String -> Maybe msg -> Bool -> Html msg
-wedge count idx top bottom msg enabled =
+wedge : Int -> Int -> String -> String -> Maybe msg -> Bool -> Bool -> Html msg
+wedge count idx top bottom msg topEnabled bottomEnabled =
     let
         startAngle =
             (2 * pi * ((toFloat (idx * 2) + 1) / (toFloat count * 2))) + pi
@@ -56,7 +56,7 @@ wedge count idx top bottom msg enabled =
             toString (50 + 50 * sin endAngle)
 
         linkAttributes =
-            if msg /= Nothing && enabled then
+            if msg /= Nothing && topEnabled then
                 [ class "wedge link" ]
             else
                 [ class "wedge" ]
@@ -67,21 +67,27 @@ wedge count idx top bottom msg enabled =
                     []
 
                 Just x ->
-                    if enabled then
+                    if topEnabled then
                         [ onClick x ]
                     else
                         []
 
         topColor =
-            if enabled then
+            if topEnabled then
                 "lime"
             else
                 "grey"
+
+        bottomColor =
+            if bottomEnabled then
+                "white"
+            else
+                "red"
     in
         a (linkAttributes ++ eventAttributes)
             [ Svg.path [ d ("M 50 50 L " ++ startX ++ " " ++ startY ++ " A 50 50 0 0 0 " ++ endX ++ " " ++ endY ++ " L 50 50 z"), fill "black" ] []
             , text_ [ x midX, y midY1, fill topColor, textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text top ]
-            , text_ [ x midX, y midY2, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text bottom ]
+            , text_ [ x midX, y midY2, fill bottomColor, textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text bottom ]
             ]
 
 
@@ -137,7 +143,7 @@ viewSix backMsg msg canPurchase team inv =
                 ]
 
         wedgeFor item =
-            wedge 6 item.index item.cost item.name item.action item.enabled
+            wedge 6 item.index item.cost item.name item.action item.enabled True
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
             ((List.map wedgeFor items)
@@ -168,7 +174,7 @@ viewFour backMsg msg canPurchase team inv =
                 ]
 
         wedgeFor item =
-            wedge 4 item.index item.cost item.name item.action item.enabled
+            wedge 4 item.index item.cost item.name item.action item.enabled True
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
             ((List.map wedgeFor items)
@@ -187,24 +193,28 @@ viewSubmenu backMsg msg canPurchase team inv =
         (viewFour backMsg msg canPurchase team inv)
 
 
-viewMenu : (Equipment.Submenu -> msg) -> Equipment.Side -> Html msg
-viewMenu msg team =
+viewMenu : (Equipment.Submenu -> msg) -> (Equipment -> Bool) -> Equipment.Side -> Html msg
+viewMenu msg canPurchase team =
     let
         teamColor =
             if team == Equipment.CT then
                 "#0000DD"
             else
                 "#DD00AA"
+
+        anyAffordable : Equipment.Submenu -> Bool
+        anyAffordable m =
+            List.any canPurchase (Equipment.listFor m)
+
+        buildWedge : Int -> Equipment.Submenu -> Html msg
+        buildWedge i m =
+            wedge 6 (i + 1) "" (Equipment.submenuName m) (Just (msg m)) True (anyAffordable m)
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
-            [ wedge 6 1 "" "PISTOLS" (Just (msg Equipment.Pistols)) True
-            , wedge 6 2 "" "HEAVY" (Just (msg Equipment.Heavy)) True
-            , wedge 6 3 "" "SMGs" (Just (msg Equipment.SMGs)) True
-            , wedge 6 4 "" "RIFLES" (Just (msg Equipment.Rifles)) True
-            , wedge 6 5 "" "GEAR" (Just (msg Equipment.GearMenu)) True
-            , wedge 6 6 "" "GRENADES" (Just (msg Equipment.Grenades)) True
-            , lineAtAngle (pi / 6)
-            , lineAtAngle (3 * pi / 6)
-            , lineAtAngle (5 * pi / 6)
-            , center Nothing team
-            ]
+            ((List.indexedMap buildWedge (.submenus Equipment.lists))
+                ++ [ lineAtAngle (pi / 6)
+                   , lineAtAngle (3 * pi / 6)
+                   , lineAtAngle (5 * pi / 6)
+                   , center Nothing team
+                   ]
+            )

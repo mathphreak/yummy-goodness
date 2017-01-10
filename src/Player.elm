@@ -146,10 +146,16 @@ buyMenuFor msg player =
     let
         canPurchase =
             playerCanPurchaseEquipment player
+
+        canUse =
+            playerCanUseEquipment player
     in
         case player.submenu of
             Nothing ->
-                BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a)) player.team
+                BuyMenu.viewMenu
+                    (\a -> (msg <| MenuSelect <| Just a))
+                    canPurchase
+                    player.team
 
             Just submenu ->
                 BuyMenu.viewSubmenu
@@ -157,7 +163,7 @@ buyMenuFor msg player =
                     (\a -> msg <| Purchase a)
                     canPurchase
                     player.team
-                    ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
+                    ((Equipment.listFor submenu) |> List.filter canUse)
 
 
 view : Maybe msg -> Bool -> Player -> Html msg

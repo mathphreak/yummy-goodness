@@ -16,6 +16,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Players have proper inventory (UI: ☹️)
 - Players are on teams (UI: ☹️)
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
+    - Deemphasize submenu if nothing inside is affordable
 - Buy things for each player (UI: ☹️)
 - Simulate rounds of game (UI: ☹️)
     - In each matchup, one player dies and one player gets $3000
@@ -23,7 +24,6 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 
 ## TODO
 
-- Grey out submenu if nothing inside is affordable
 - Make players drop weapons
 - Make enemies buy things too
 - Explain some things
@@ -37,3 +37,4 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Weapon damage exists
     - Armor is a thing
     - Matchups are better
+- Appease the gods of line length

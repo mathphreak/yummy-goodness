@@ -152,6 +152,28 @@ listFor m =
             lists.grenades
 
 
+submenuName : Submenu -> String
+submenuName m =
+    case m of
+        Pistols ->
+            "PISTOLS"
+
+        Heavy ->
+            "HEAVY"
+
+        SMGs ->
+            "SMGs"
+
+        Rifles ->
+            "RIFLES"
+
+        GearMenu ->
+            "GEAR"
+
+        Grenades ->
+            "GRENADES"
+
+
 toString : Equipment -> String
 toString e =
     case e of
