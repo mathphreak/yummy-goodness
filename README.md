@@ -37,4 +37,4 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Weapon damage exists
     - Armor is a thing
     - Matchups are better
-- Appease the gods of line length
+- Appease the gods of line length and dead code

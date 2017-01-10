@@ -98,7 +98,7 @@ center backMsg team =
             if team == Equipment.CT then
                 "#0000DD"
             else
-                "#DD00AA"
+                "#DDAA00"
 
         clickCenterAction =
             case backMsg of
@@ -196,12 +196,6 @@ viewSubmenu backMsg msg canPurchase team inv =
 viewMenu : (Equipment.Submenu -> msg) -> (Equipment -> Bool) -> Equipment.Side -> Html msg
 viewMenu msg canPurchase team =
     let
-        teamColor =
-            if team == Equipment.CT then
-                "#0000DD"
-            else
-                "#DD00AA"
-
         anyAffordable : Equipment.Submenu -> Bool
         anyAffordable m =
             List.any canPurchase (Equipment.listFor m)
