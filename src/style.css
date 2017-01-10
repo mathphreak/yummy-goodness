@@ -1,0 +1,39 @@
+.wedge:hover path {
+    fill: rebeccapurple;
+}
+
+svg a.link {
+    cursor: pointer;
+}
+
+.team {
+    display: flex;
+    flex-flow: column;
+}
+
+.player h2 {
+    font-weight: normal;
+}
+
+.player p {
+    margin: 0.5em 0 0 0;
+}
+
+.ui {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.us, .them {
+    width: 10em;
+}
+
+.player.selected {
+    background-color: slategrey;
+}
+
+.us .player {
+    cursor: pointer;
+}

@@ -3,6 +3,7 @@ module Team exposing (..)
 import Player exposing (Player, newPlayer)
 import Equipment
 import Html exposing (Html)
+import Html.Attributes exposing (..)
 
 
 -- MODEL
@@ -13,12 +14,22 @@ type alias Team =
     }
 
 
-ctTeam =
-    Team (List.repeat 5 (newPlayer Equipment.CT))
+buildTeam : Equipment.Side -> List String -> Team
+buildTeam side names =
+    let
+        players =
+            names
+                |> List.map (newPlayer side)
+    in
+        Team players
 
 
-tTeam =
-    Team (List.repeat 5 (newPlayer Equipment.T))
+getPlayer : Int -> Team -> Maybe Player
+getPlayer i team =
+    team.players
+        |> List.take (i + 1)
+        |> List.drop i
+        |> List.head
 
 
 
@@ -54,11 +65,11 @@ update msg team =
 -- VIEW
 
 
-view : (Msg -> msg) -> Team -> Html msg
-view msg team =
+view : Maybe (Int -> msg) -> Maybe Int -> Team -> Html msg
+view msg selected team =
     let
         viewPlayer i p =
-            Player.view (\a -> msg <| (PlayerMessage i a)) p
+            Player.view (msg |> Maybe.map (\m -> m i)) (selected == Just i) p
     in
-        Html.div []
+        Html.div [ class "team" ]
             (List.indexedMap viewPlayer team.players)

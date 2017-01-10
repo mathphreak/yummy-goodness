@@ -2,6 +2,7 @@ module Player exposing (..)
 
 import Equipment exposing (Equipment, Side, Submenu)
 import Html exposing (Html)
+import Html.Attributes
 import Html.Events
 import String
 import BuyMenu
@@ -18,11 +19,12 @@ type alias Player =
     , gear : List Equipment
     , grenades : List Equipment
     , submenu : Maybe Submenu
+    , name : String
     }
 
 
-newPlayer : Side -> Player
-newPlayer side =
+newPlayer : Side -> String -> Player
+newPlayer side name =
     let
         pistol =
             case side of
@@ -32,7 +34,7 @@ newPlayer side =
                 Equipment.T ->
                     Equipment.Glock
     in
-        Player 800 side (Just pistol) Nothing [] [] Nothing
+        Player 800 side (Just pistol) Nothing [] [] Nothing name
 
 
 
@@ -54,6 +56,9 @@ update msg origPlayer =
 
                 player =
                     { origPlayer | money = newMoney, submenu = Nothing }
+
+                sortByName =
+                    List.sortBy Equipment.toString
             in
                 case (Equipment.slot item) of
                     Equipment.Primary ->
@@ -64,12 +69,12 @@ update msg origPlayer =
 
                     Equipment.GearSlot ->
                         if item == Equipment.VestHelmet then
-                            { player | gear = item :: (List.filter ((/=) Equipment.Vest) player.gear) }
+                            { player | gear = sortByName (item :: (List.filter ((/=) Equipment.Vest) player.gear)) }
                         else
-                            { player | gear = item :: player.gear }
+                            { player | gear = sortByName (item :: player.gear) }
 
                     Equipment.Grenade ->
-                        { player | grenades = item :: player.grenades }
+                        { player | grenades = sortByName (item :: player.grenades) }
 
         MenuSelect sm ->
             { origPlayer | submenu = sm }
@@ -132,15 +137,35 @@ buyMenuFor msg player =
                     ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
 
 
-view : (Msg -> msg) -> Player -> Html msg
-view msg player =
-    Html.div []
-        [ Html.text (toString player.money)
-        , Html.ul []
-            [ Html.li [] [ Html.text (Maybe.withDefault "nothing" (player.primary |> Maybe.map Equipment.toString)) ]
-            , Html.li [] [ Html.text (Maybe.withDefault "nothing" (player.secondary |> Maybe.map Equipment.toString)) ]
-            , Html.li [] [ Html.text (player.gear |> List.map Equipment.toString |> String.join ", ") ]
-            , Html.li [] [ Html.text (player.grenades |> List.map Equipment.toString |> String.join ", ") ]
+view : Maybe msg -> Bool -> Player -> Html msg
+view onClick selected player =
+    let
+        main =
+            [ player.primary, player.secondary ] |> List.filterMap (Maybe.map identity)
+
+        inventory =
+            main ++ player.gear ++ player.grenades
+
+        selectionAttr =
+            if selected then
+                [ Html.Attributes.class "player selected" ]
+            else
+                [ Html.Attributes.class "player" ]
+
+        handleClick =
+            case onClick of
+                Just msg ->
+                    [ Html.Events.onClick msg ]
+
+                Nothing ->
+                    []
+    in
+        Html.div (selectionAttr ++ handleClick)
+            [ Html.h2 []
+                [ Html.strong [] [ Html.text player.name ]
+                , Html.text (", $" ++ toString player.money)
+                ]
+            , Html.p []
+                [ Html.text (inventory |> List.map Equipment.toString |> String.join ", ")
+                ]
             ]
-        , buyMenuFor msg player
-        ]
