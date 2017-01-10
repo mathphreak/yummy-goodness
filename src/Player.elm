@@ -22,7 +22,7 @@ type alias Player =
 
 
 emptyPlayer =
-    Player 0 Equipment.CT Nothing Nothing [] [] Nothing
+    Player 10000 Equipment.CT Nothing Nothing [] [] Nothing
 
 
 
@@ -35,24 +35,34 @@ type Msg
 
 
 update : Msg -> Player -> Player
-update msg player =
+update msg origPlayer =
     case msg of
         Purchase item ->
-            case (Equipment.slot item) of
-                Equipment.Primary ->
-                    { player | primary = Just item, submenu = Nothing }
+            let
+                newMoney =
+                    origPlayer.money - (Equipment.cost item)
 
-                Equipment.Secondary ->
-                    { player | secondary = Just item, submenu = Nothing }
+                player =
+                    { origPlayer | money = newMoney, submenu = Nothing }
+            in
+                case (Equipment.slot item) of
+                    Equipment.Primary ->
+                        { player | primary = Just item }
 
-                Equipment.GearSlot ->
-                    { player | gear = item :: player.gear, submenu = Nothing }
+                    Equipment.Secondary ->
+                        { player | secondary = Just item }
 
-                Equipment.Grenade ->
-                    { player | grenades = item :: player.grenades, submenu = Nothing }
+                    Equipment.GearSlot ->
+                        if item == Equipment.VestHelmet then
+                            { player | gear = item :: (List.filter ((/=) Equipment.Vest) player.gear) }
+                        else
+                            { player | gear = item :: player.gear }
+
+                    Equipment.Grenade ->
+                        { player | grenades = item :: player.grenades }
 
         MenuSelect sm ->
-            { player | submenu = sm }
+            { origPlayer | submenu = sm }
 
 
 
@@ -69,14 +79,47 @@ playerCanUseEquipment p e =
             True
 
 
+playerCanPurchaseEquipment : Player -> Equipment -> Bool
+playerCanPurchaseEquipment p e =
+    if (Equipment.cost e) > p.money then
+        False
+    else if (p.primary == Just e) then
+        False
+    else if (p.secondary == Just e) then
+        False
+    else if not (playerCanUseEquipment p e) then
+        False
+    else if (List.member e p.gear) then
+        False
+    else if (e == Equipment.Vest && List.member Equipment.VestHelmet p.gear) then
+        False
+    else if ((Equipment.slot e) == Equipment.Grenade) && List.length p.grenades > 3 then
+        False
+    else if (e /= Equipment.Flash && List.member e p.grenades) then
+        False
+    else if (e == Equipment.Flash && (List.length (List.filter ((==) Equipment.Flash) p.grenades)) > 1) then
+        False
+    else
+        True
+
+
 buyMenuFor : (Msg -> msg) -> Player -> Html msg
 buyMenuFor msg player =
-    case player.submenu of
-        Nothing ->
-            BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a)) player.team
+    let
+        canPurchase =
+            playerCanPurchaseEquipment player
+    in
+        case player.submenu of
+            Nothing ->
+                BuyMenu.viewMenu (\a -> (msg <| MenuSelect <| Just a)) player.team
 
-        Just submenu ->
-            BuyMenu.viewSubmenu (msg <| MenuSelect Nothing) (\a -> msg <| Purchase a) player.team ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
+            Just submenu ->
+                BuyMenu.viewSubmenu
+                    (msg <| MenuSelect Nothing)
+                    (\a -> msg <| Purchase a)
+                    canPurchase
+                    player.team
+                    ((Equipment.listFor submenu) |> List.filter (playerCanUseEquipment player))
 
 
 view : (Msg -> msg) -> Player -> Html msg

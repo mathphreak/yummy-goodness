@@ -22,8 +22,8 @@ lineAtAngle angle =
         []
 
 
-wedge : Int -> Int -> String -> String -> Maybe msg -> Html msg
-wedge count idx top bottom msg =
+wedge : Int -> Int -> String -> String -> Maybe msg -> Bool -> Html msg
+wedge count idx top bottom msg enabled =
     let
         startAngle =
             (2 * pi * ((toFloat (idx * 2) + 1) / (toFloat count * 2))) + pi
@@ -55,17 +55,32 @@ wedge count idx top bottom msg =
         endY =
             toString (50 + 50 * sin endAngle)
 
+        linkAttributes =
+            if msg /= Nothing && enabled then
+                [ class "wedge link" ]
+            else
+                [ class "wedge" ]
+
         eventAttributes =
             case msg of
                 Nothing ->
-                    [ class "wedge" ]
+                    []
 
                 Just x ->
-                    [ class "wedge link", onClick x ]
+                    if enabled then
+                        [ onClick x ]
+                    else
+                        []
+
+        topColor =
+            if enabled then
+                "lime"
+            else
+                "grey"
     in
-        a eventAttributes
+        a (linkAttributes ++ eventAttributes)
             [ Svg.path [ d ("M 50 50 L " ++ startX ++ " " ++ startY ++ " A 50 50 0 0 0 " ++ endX ++ " " ++ endY ++ " L 50 50 z"), fill "black" ] []
-            , text_ [ x midX, y midY1, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text top ]
+            , text_ [ x midX, y midY1, fill topColor, textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text top ]
             , text_ [ x midX, y midY2, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text bottom ]
             ]
 
@@ -103,21 +118,26 @@ center backMsg team =
             )
 
 
-viewSix : msg -> (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
-viewSix backMsg msg team inv =
+viewSix : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Team -> List Equipment -> Html msg
+viewSix backMsg msg canPurchase team inv =
     let
         buildItem i e =
-            { index = (i + 1), cost = "$" ++ (toString (Equipment.cost e)), name = Equipment.toString e, action = Just (msg e) }
+            { index = (i + 1)
+            , cost = "$" ++ (toString (Equipment.cost e))
+            , name = Equipment.toString e
+            , action = Just (msg e)
+            , enabled = canPurchase e
+            }
 
         items =
             List.concat
                 [ inv
                     |> List.indexedMap buildItem
-                , List.repeat (6 - (List.length inv)) { index = 6, cost = "", name = "", action = Nothing }
+                , List.repeat (6 - (List.length inv)) { index = 6, cost = "", name = "", action = Nothing, enabled = False }
                 ]
 
         wedgeFor item =
-            wedge 6 item.index item.cost item.name item.action
+            wedge 6 item.index item.cost item.name item.action item.enabled
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
             ((List.map wedgeFor items)
@@ -129,21 +149,26 @@ viewSix backMsg msg team inv =
             )
 
 
-viewFour : msg -> (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
-viewFour backMsg msg team inv =
+viewFour : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Team -> List Equipment -> Html msg
+viewFour backMsg msg canPurchase team inv =
     let
         buildItem i e =
-            { index = (i + 1), cost = "$" ++ (toString (Equipment.cost e)), name = Equipment.toString e, action = Just (msg e) }
+            { index = (i + 1)
+            , cost = "$" ++ (toString (Equipment.cost e))
+            , name = Equipment.toString e
+            , action = Just (msg e)
+            , enabled = canPurchase e
+            }
 
         items =
             List.concat
                 [ inv
                     |> List.indexedMap buildItem
-                , List.repeat (4 - (List.length inv)) { index = 4, cost = "", name = "", action = Nothing }
+                , List.repeat (4 - (List.length inv)) { index = 4, cost = "", name = "", action = Nothing, enabled = False }
                 ]
 
         wedgeFor item =
-            wedge 4 item.index item.cost item.name item.action
+            wedge 4 item.index item.cost item.name item.action item.enabled
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
             ((List.map wedgeFor items)
@@ -154,12 +179,12 @@ viewFour backMsg msg team inv =
             )
 
 
-viewSubmenu : msg -> (Equipment -> msg) -> Equipment.Team -> List Equipment -> Html msg
-viewSubmenu backMsg msg team inv =
+viewSubmenu : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Team -> List Equipment -> Html msg
+viewSubmenu backMsg msg canPurchase team inv =
     if (List.length inv) > 4 then
-        (viewSix backMsg msg team inv)
+        (viewSix backMsg msg canPurchase team inv)
     else
-        (viewFour backMsg msg team inv)
+        (viewFour backMsg msg canPurchase team inv)
 
 
 viewMenu : (Equipment.Submenu -> msg) -> Equipment.Team -> Html msg
@@ -172,12 +197,12 @@ viewMenu msg team =
                 "#DD00AA"
     in
         svg [ viewBox "0 0 100 100", width "300px" ]
-            [ wedge 6 1 "" "PISTOLS" (Just (msg Equipment.Pistols))
-            , wedge 6 2 "" "HEAVY" (Just (msg Equipment.Heavy))
-            , wedge 6 3 "" "SMGs" (Just (msg Equipment.SMGs))
-            , wedge 6 4 "" "RIFLES" (Just (msg Equipment.Rifles))
-            , wedge 6 5 "" "GEAR" (Just (msg Equipment.GearMenu))
-            , wedge 6 6 "" "GRENADES" (Just (msg Equipment.Grenades))
+            [ wedge 6 1 "" "PISTOLS" (Just (msg Equipment.Pistols)) True
+            , wedge 6 2 "" "HEAVY" (Just (msg Equipment.Heavy)) True
+            , wedge 6 3 "" "SMGs" (Just (msg Equipment.SMGs)) True
+            , wedge 6 4 "" "RIFLES" (Just (msg Equipment.Rifles)) True
+            , wedge 6 5 "" "GEAR" (Just (msg Equipment.GearMenu)) True
+            , wedge 6 6 "" "GRENADES" (Just (msg Equipment.Grenades)) True
             , lineAtAngle (pi / 6)
             , lineAtAngle (3 * pi / 6)
             , lineAtAngle (5 * pi / 6)
