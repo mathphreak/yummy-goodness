@@ -57,13 +57,13 @@ wedge count idx top bottom msg =
 
         eventAttributes =
             case msg of
-                Just x ->
-                    [ onClick x ]
-
                 Nothing ->
-                    []
+                    [ class "wedge" ]
+
+                Just x ->
+                    [ class "wedge link", onClick x ]
     in
-        a ([ class "wedge link" ] ++ eventAttributes)
+        a eventAttributes
             [ Svg.path [ d ("M 50 50 L " ++ startX ++ " " ++ startY ++ " A 50 50 0 0 0 " ++ endX ++ " " ++ endY ++ " L 50 50 z"), fill "black" ] []
             , text_ [ x midX, y midY1, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text top ]
             , text_ [ x midX, y midY2, fill "white", textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text bottom ]
