@@ -18,7 +18,8 @@ import Html.Attributes exposing (..)
 
 
 type alias Team =
-    { players : Array Player
+    { side : Equipment.Side
+    , players : Array Player
     }
 
 
@@ -29,7 +30,7 @@ buildTeam side names =
             names
                 |> Array.map (newPlayer side)
     in
-        Team players
+        Team side players
 
 
 

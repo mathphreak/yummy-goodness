@@ -21,7 +21,8 @@ type alias SimulatedPlayer =
 
 
 type alias SimulatedTeam =
-    { players : Array SimulatedPlayer
+    { side : Equipment.Side
+    , players : Array SimulatedPlayer
     }
 
 
@@ -42,7 +43,7 @@ makeState ( us, them ) =
 
         simTeam : Team -> SimulatedTeam
         simTeam t =
-            SimulatedTeam (Array.map simPlayer t.players)
+            SimulatedTeam t.side (Array.map simPlayer t.players)
     in
         ( simTeam us, simTeam them )
 
@@ -59,7 +60,7 @@ breakState ( simUs, simThem ) =
 
         breakTeam : SimulatedTeam -> Team
         breakTeam t =
-            Team (Array.map breakPlayer t.players)
+            Team t.side (Array.map breakPlayer t.players)
     in
         ( breakTeam simUs, breakTeam simThem )
 

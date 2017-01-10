@@ -35,7 +35,12 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Team Array.empty) (Team Array.empty) Nothing, Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool) )
+    ( Model
+        (Team Equipment.CT Array.empty)
+        (Team Equipment.CT Array.empty)
+        Nothing
+    , Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool)
+    )
 
 
 
@@ -91,7 +96,7 @@ update msg model =
             ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them )) )
 
         EndSimulation ( us, them ) ->
-            ( { model | us = us, them = them }, Cmd.none )
+            ( { model | us = us, them = them, selectedPlayer = Nothing }, Cmd.none )
 
 
 
@@ -126,12 +131,12 @@ view model =
         Html.div []
             [ Html.div [ Html.Attributes.class "ui between-rounds" ]
                 [ Html.div [ Html.Attributes.class "us" ]
-                    [ Html.h1 [] [ Html.text "US" ]
+                    [ Html.h1 [] [ Html.text ("US (" ++ (toString model.us.side) ++ ")") ]
                     , Team.view (Just SelectPlayer) model.selectedPlayer model.us
                     ]
                 , menu
                 , Html.div [ Html.Attributes.class "them" ]
-                    [ Html.h1 [] [ Html.text "THEM" ]
+                    [ Html.h1 [] [ Html.text ("THEM (" ++ (toString model.them.side) ++ ")") ]
                     , Team.view Nothing Nothing model.them
                     ]
                 ]

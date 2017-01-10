@@ -14,7 +14,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 ## FEATURES
 
 - Players have proper inventory (UI: ☹️)
-- Players are on teams (UI: ☹️)
+- Players are on teams (UI: 😐)
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
     - Deemphasize submenu if nothing inside is affordable
 - Buy things for each player (UI: ☹️)
@@ -30,11 +30,12 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Difficulty settings
     - Don't show enemy equipment
     - Time limit for purchases
-    - Players don't actually listen
+    - Players don't always do what you say
 - Simulate rounds of game
     - Round win/loss exists
     - Weapon kill rewards are a thing
     - Weapon damage exists
     - Armor is a thing
     - Matchups are better
+    - Switch sides at halftime
 - Appease the gods of line length and dead code
