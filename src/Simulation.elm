@@ -4,7 +4,7 @@ module Simulation
         )
 
 import Player exposing (Player)
-import Equipment
+import Equipment exposing (Equipment)
 import Team exposing (Team)
 import Array exposing (Array)
 import Random exposing (..)
@@ -155,9 +155,39 @@ simulateStep state =
         |> andThen (grabAndRunMatchup state)
 
 
+aiEnemyPurchase : Player -> Player
+aiEnemyPurchase them =
+    let
+        purchaseIfPossible : Equipment -> Player -> Player
+        purchaseIfPossible e p =
+            if (Player.playerCanPurchaseEquipment p e) then
+                Player.update (Player.Purchase e) p
+            else
+                p
+    in
+        them
+            |> purchaseIfPossible Equipment.VestHelmet
+            |> purchaseIfPossible Equipment.Vest
+            |> purchaseIfPossible Equipment.AWP
+            |> purchaseIfPossible Equipment.AK47
+            |> purchaseIfPossible Equipment.M4A4
+            |> purchaseIfPossible Equipment.XM1014
+            |> purchaseIfPossible Equipment.Deagle
+            |> purchaseIfPossible Equipment.Smoke
+
+
+runEnemyAI : Team -> Team
+runEnemyAI theirTeam =
+    let
+        players =
+            theirTeam.players |> Array.map aiEnemyPurchase
+    in
+        { theirTeam | players = players }
+
+
 simulate : ( Team, Team ) -> Generator ( Team, Team )
-simulate init =
-    makeState init
+simulate ( ourTeam, theirTeam ) =
+    makeState ( ourTeam, runEnemyAI theirTeam )
         |> simulateStep
         |> andThen simulateStep
         |> andThen simulateStep

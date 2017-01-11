@@ -18,6 +18,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
     - Deemphasize submenu if nothing inside is affordable
 - Buy things for each player (UI: ☹️)
+- Make enemies buy things too
 - Make players drop weapons (UI: ☹️)
 - Simulate rounds of game (UI: ☹️)
     - In each matchup, one player dies and one player gets $3000
@@ -25,11 +26,11 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 
 ## TODO
 
-- Make enemies buy things too
 - Explain some things
 - Difficulty settings
-    - Don't show enemy equipment
+    - Don't show enemy equipment from last round
     - Time limit for purchases
+    - Enemies buy things competently
     - Players don't always do what you say
 - Simulate rounds of game
     - Round win/loss exists

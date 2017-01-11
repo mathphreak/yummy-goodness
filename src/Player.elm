@@ -3,10 +3,11 @@ module Player
         ( Player
         , newPlayer
         , dead
-        , Msg(DropPrimary, DropSecondary, PickUp)
+        , Msg(..)
         , update
         , buyMenuFor
         , actionsFor
+        , playerCanPurchaseEquipment
         , view
         )
 
