@@ -295,127 +295,6 @@ toString e =
             "Smoke"
 
 
-cost : Equipment -> Int
-cost e =
-    case e of
-        Glock ->
-            200
-
-        USPS ->
-            200
-
-        P250 ->
-            300
-
-        Deagle ->
-            700
-
-        Berettas ->
-            500
-
-        Tec9 ->
-            500
-
-        FiveSeven ->
-            500
-
-        Nova ->
-            1200
-
-        XM1014 ->
-            2000
-
-        SawedOff ->
-            1200
-
-        MAG7 ->
-            1800
-
-        MAC10 ->
-            1050
-
-        MP9 ->
-            1250
-
-        MP7 ->
-            1700
-
-        UMP45 ->
-            1200
-
-        PPBizon ->
-            1400
-
-        P90 ->
-            2350
-
-        GalilAR ->
-            2000
-
-        FAMAS ->
-            2250
-
-        AK47 ->
-            2700
-
-        M4A4 ->
-            3100
-
-        SSG08 ->
-            1700
-
-        SG553 ->
-            3000
-
-        AUG ->
-            3300
-
-        AWP ->
-            4750
-
-        G3SG1 ->
-            5000
-
-        SCAR20 ->
-            5000
-
-        M249 ->
-            5200
-
-        Negev ->
-            5700
-
-        Vest ->
-            650
-
-        VestHelmet ->
-            1000
-
-        Zeus ->
-            200
-
-        Defuse ->
-            400
-
-        Molotov ->
-            400
-
-        Incendiary ->
-            600
-
-        Decoy ->
-            50
-
-        HENade ->
-            300
-
-        Flash ->
-            200
-
-        Smoke ->
-            300
-
-
 teamRestriction : Equipment -> Maybe Side
 teamRestriction e =
     case e of
@@ -536,3 +415,142 @@ slot e =
 
         _ ->
             Primary
+
+
+
+-- statistics from http://strike-counter.com/cs-go-stats/weapons-stats and http://counterstrike.wikia.com/
+
+
+type alias WeaponStats =
+    { cost : Int
+    , killReward : Int
+    , baseDamage : Int
+    , dps : Int
+    }
+
+
+stats : Equipment -> WeaponStats
+stats e =
+    case e of
+        Glock ->
+            WeaponStats 200 300 28 187
+
+        USPS ->
+            WeaponStats 200 300 35 206
+
+        P250 ->
+            WeaponStats 300 300 35 233
+
+        Deagle ->
+            WeaponStats 700 300 63 280
+
+        Berettas ->
+            WeaponStats 500 300 38 317
+
+        Tec9 ->
+            WeaponStats 500 300 33 275
+
+        FiveSeven ->
+            WeaponStats 500 300 32 213
+
+        Nova ->
+            WeaponStats 1200 900 (26 * 2) 266
+
+        XM1014 ->
+            WeaponStats 2000 900 (20 * 2) 343
+
+        SawedOff ->
+            WeaponStats 1200 900 (32 * 2) 301
+
+        MAG7 ->
+            WeaponStats 1800 900 (30 * 2) 282
+
+        MAC10 ->
+            WeaponStats 1050 600 29 387
+
+        MP9 ->
+            WeaponStats 1250 600 26 371
+
+        MP7 ->
+            WeaponStats 1700 600 29 363
+
+        UMP45 ->
+            WeaponStats 1200 600 35 389
+
+        PPBizon ->
+            WeaponStats 1400 600 27 338
+
+        P90 ->
+            WeaponStats 2350 300 26 371
+
+        GalilAR ->
+            WeaponStats 2000 300 30 333
+
+        FAMAS ->
+            WeaponStats 2250 300 30 333
+
+        AK47 ->
+            WeaponStats 2700 300 36 360
+
+        M4A4 ->
+            WeaponStats 3100 300 33 367
+
+        SSG08 ->
+            WeaponStats 1700 300 88 70
+
+        SG553 ->
+            WeaponStats 3000 300 30 333
+
+        AUG ->
+            WeaponStats 3300 300 28 311
+
+        AWP ->
+            WeaponStats 4750 100 115 79
+
+        G3SG1 ->
+            WeaponStats 5000 300 80 320
+
+        SCAR20 ->
+            WeaponStats 5000 300 80 320
+
+        M249 ->
+            WeaponStats 5200 300 32 400
+
+        Negev ->
+            WeaponStats 5700 300 35 583
+
+        Vest ->
+            WeaponStats 650 0 0 0
+
+        VestHelmet ->
+            WeaponStats 1000 0 0 0
+
+        Zeus ->
+            WeaponStats 200 0 500 0
+
+        Defuse ->
+            WeaponStats 400 0 0 0
+
+        -- shout out to https://www.youtube.com/watch?v=MbDkyndlQGk
+        Molotov ->
+            WeaponStats 400 300 32 25
+
+        Incendiary ->
+            WeaponStats 600 300 32 25
+
+        Decoy ->
+            WeaponStats 50 0 0 0
+
+        HENade ->
+            WeaponStats 300 300 (98 // 2) 0
+
+        Flash ->
+            WeaponStats 200 0 0 0
+
+        Smoke ->
+            WeaponStats 300 0 0 0
+
+
+cost : Equipment -> Int
+cost e =
+    .cost (stats e)

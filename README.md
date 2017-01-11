@@ -21,23 +21,26 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Make enemies buy things too
 - Make players drop weapons (UI: ☹️)
 - Simulate rounds of game (UI: ☹️)
-    - In each matchup, one player dies and one player gets $3000
+    - In each matchup, one player kills the other while taking no damage
     - This happens five times per round but skips if one player is dead
+    - Round win/loss bonus exists
+    - Weapon kill rewards are a thing
 
 ## TODO
 
 - Explain some things
+- Helmet costs less if vest already owned
+- Show killfeed
 - Difficulty settings
     - Don't show enemy equipment from last round
     - Time limit for purchases
     - Enemies buy things competently
     - Players don't always do what you say
 - Simulate rounds of game
-    - Round win/loss exists
-    - Weapon kill rewards are a thing
     - Weapon damage exists
     - Armor is a thing
     - Matchups are better
+    - Lose or win rounds based on real things
     - Switch sides at halftime
     - Pick up enemy weapons sometimes
 - Appease the gods of line length and dead code
