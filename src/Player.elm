@@ -242,15 +242,25 @@ view onClick selected player =
 
                 Nothing ->
                     []
+
+        buildList sep inventory =
+            inventory
+                |> List.map (\i -> Html.span [] [ Html.text (Equipment.toString i) ])
+                |> List.intersperse (Html.text sep)
     in
         Html.div (selectionAttr ++ handleClick)
             [ Html.h2 []
                 [ Html.strong [] [ Html.text player.name ]
                 , Html.text (", $" ++ toString player.money)
                 ]
-            , Html.p [ Html.Attributes.class "inventory" ]
-                (inventory
-                    |> List.map (\i -> Html.span [] [ Html.text (Equipment.toString i) ])
-                    |> List.intersperse (Html.text ", ")
-                )
+            , Html.ul [ Html.Attributes.class "inventory" ]
+                [ Html.li []
+                    (buildList " / "
+                        ((Maybe.Extra.maybeToList player.primary)
+                            ++ (Maybe.Extra.maybeToList player.secondary)
+                        )
+                    )
+                , Html.li [] (buildList ", " player.gear)
+                , Html.li [] (buildList ", " player.grenades)
+                ]
             ]

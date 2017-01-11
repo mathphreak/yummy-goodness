@@ -13,7 +13,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 
 ## FEATURES
 
-- Players have proper inventory (UI: ☹️)
+- Players have proper inventory (UI: 🙂)
 - Players are on teams (UI: 😐)
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
     - Deemphasize submenu if nothing inside is affordable

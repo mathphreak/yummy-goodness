@@ -15,6 +15,7 @@ svg a.link {
 
 .player h2 {
     font-weight: normal;
+    margin-bottom: 0;
 }
 
 .player p {
@@ -42,6 +43,17 @@ svg a.link {
 
 body {
     font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+}
+
+.inventory {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.inventory li {
+    list-style-type: none;
+    height: 19px;
 }
 
 .inventory span {
@@ -54,4 +66,8 @@ body {
 
 .ground button {
     display: block;
+}
+
+.player:first-child h2 {
+    margin-top: 0;
 }
