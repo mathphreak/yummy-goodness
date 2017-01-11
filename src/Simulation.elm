@@ -60,7 +60,7 @@ breakState ( simUs, simThem ) =
 
         breakTeam : SimulatedTeam -> Team
         breakTeam t =
-            Team t.side (Array.map breakPlayer t.players)
+            Team t.side (Array.map breakPlayer t.players) Array.empty
     in
         ( breakTeam simUs, breakTeam simThem )
 

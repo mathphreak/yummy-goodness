@@ -3,9 +3,10 @@ module Player
         ( Player
         , newPlayer
         , dead
-        , Msg
+        , Msg(DropPrimary, DropSecondary, PickUp)
         , update
         , buyMenuFor
+        , actionsFor
         , view
         )
 
@@ -15,6 +16,7 @@ import Html.Attributes
 import Html.Events
 import String
 import BuyMenu
+import Maybe.Extra
 
 
 -- MODEL
@@ -29,6 +31,7 @@ type alias Player =
     , grenades : List Equipment
     , submenu : Maybe Submenu
     , name : String
+    , dropped : List Equipment
     }
 
 
@@ -43,7 +46,7 @@ newPlayer side name =
                 Equipment.T ->
                     Equipment.Glock
     in
-        Player 800 side (Just pistol) Nothing [] [] Nothing name
+        Player 800 side (Just pistol) Nothing [] [] Nothing name []
 
 
 dead : Player -> Player
@@ -66,7 +69,10 @@ dead p =
 
 type Msg
     = Purchase Equipment
+    | PickUp Equipment
     | MenuSelect (Maybe Submenu)
+    | DropPrimary
+    | DropSecondary
 
 
 update : Msg -> Player -> Player
@@ -83,12 +89,28 @@ update msg origPlayer =
                 sortByName =
                     List.sortBy Equipment.toString
             in
+                update (PickUp item) player
+
+        PickUp item ->
+            let
+                player =
+                    { origPlayer | submenu = Nothing, dropped = [] }
+
+                sortByName =
+                    List.sortBy Equipment.toString
+
+                oldPrimary =
+                    origPlayer.primary
+
+                oldSecondary =
+                    origPlayer.secondary
+            in
                 case (Equipment.slot item) of
                     Equipment.Primary ->
-                        { player | primary = Just item }
+                        { player | primary = Just item, dropped = Maybe.Extra.maybeToList oldPrimary }
 
                     Equipment.Secondary ->
-                        { player | secondary = Just item }
+                        { player | secondary = Just item, dropped = Maybe.Extra.maybeToList oldSecondary }
 
                     Equipment.GearSlot ->
                         if item == Equipment.VestHelmet then
@@ -101,6 +123,12 @@ update msg origPlayer =
 
         MenuSelect sm ->
             { origPlayer | submenu = sm }
+
+        DropPrimary ->
+            { origPlayer | primary = Nothing, dropped = Maybe.Extra.maybeToList origPlayer.primary }
+
+        DropSecondary ->
+            { origPlayer | secondary = Nothing, dropped = Maybe.Extra.maybeToList origPlayer.secondary }
 
 
 
@@ -142,7 +170,7 @@ playerCanPurchaseEquipment p e =
 
 
 buyMenuFor : (Msg -> msg) -> Player -> Html msg
-buyMenuFor msg player =
+buyMenuFor wrapMsg player =
     let
         canPurchase =
             playerCanPurchaseEquipment player
@@ -153,24 +181,49 @@ buyMenuFor msg player =
         case player.submenu of
             Nothing ->
                 BuyMenu.viewMenu
-                    (\a -> (msg <| MenuSelect <| Just a))
+                    (\a -> (wrapMsg <| MenuSelect <| Just a))
                     canPurchase
                     player.team
 
             Just submenu ->
                 BuyMenu.viewSubmenu
-                    (msg <| MenuSelect Nothing)
-                    (\a -> msg <| Purchase a)
+                    (wrapMsg <| MenuSelect Nothing)
+                    (\a -> wrapMsg <| Purchase a)
                     canPurchase
                     player.team
                     ((Equipment.listFor submenu) |> List.filter canUse)
+
+
+actionsFor : (Msg -> msg) -> Player -> Html msg
+actionsFor wrapMsg player =
+    let
+        dropPrimaryButtons =
+            case player.primary of
+                Just p ->
+                    [ Html.button [ Html.Events.onClick (wrapMsg DropPrimary) ] [ Html.text ("Drop " ++ (Equipment.toString p)) ] ]
+
+                Nothing ->
+                    []
+
+        dropSecondaryButtons =
+            case player.secondary of
+                Just p ->
+                    [ Html.button [ Html.Events.onClick (wrapMsg DropSecondary) ] [ Html.text ("Drop " ++ (Equipment.toString p)) ] ]
+
+                Nothing ->
+                    []
+    in
+        Html.div []
+            (dropPrimaryButtons
+                ++ dropSecondaryButtons
+            )
 
 
 view : Maybe msg -> Bool -> Player -> Html msg
 view onClick selected player =
     let
         main =
-            [ player.primary, player.secondary ] |> List.filterMap (Maybe.map identity)
+            [ player.primary, player.secondary ] |> List.filterMap identity
 
         inventory =
             main ++ player.gear ++ player.grenades

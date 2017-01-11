@@ -47,3 +47,11 @@ body {
 .inventory span {
     white-space: nowrap;
 }
+
+.ground {
+    margin: 0px auto;
+}
+
+.ground button {
+    display: block;
+}

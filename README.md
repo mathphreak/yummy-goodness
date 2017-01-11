@@ -18,13 +18,13 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
     - Deemphasize submenu if nothing inside is affordable
 - Buy things for each player (UI: ☹️)
+- Make players drop weapons (UI: ☹️)
 - Simulate rounds of game (UI: ☹️)
     - In each matchup, one player dies and one player gets $3000
     - This happens five times per round but skips if one player is dead
 
 ## TODO
 
-- Make players drop weapons
 - Make enemies buy things too
 - Explain some things
 - Difficulty settings
@@ -38,4 +38,5 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Armor is a thing
     - Matchups are better
     - Switch sides at halftime
+    - Pick up enemy weapons sometimes
 - Appease the gods of line length and dead code

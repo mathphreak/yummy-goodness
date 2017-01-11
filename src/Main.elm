@@ -36,8 +36,8 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( Model
-        (Team Equipment.CT Array.empty)
-        (Team Equipment.CT Array.empty)
+        (Team.buildTeam Equipment.CT Array.empty)
+        (Team.buildTeam Equipment.CT Array.empty)
         Nothing
     , Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool)
     )
@@ -112,32 +112,48 @@ subscriptions model =
 -- VIEW
 
 
+getSelectedPlayer : Model -> Maybe ( Int, Player )
+getSelectedPlayer model =
+    model.selectedPlayer
+        |> Maybe.andThen (\i -> Maybe.map2 (,) (Just i) (Array.get i model.us.players))
+
+
 view : Model -> Html Msg
 view model =
     let
         menu =
-            case model.selectedPlayer of
-                Just i ->
-                    case (Array.get i model.us.players) of
-                        Just p ->
-                            Player.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
-
-                        Nothing ->
-                            Html.p [] [ Html.text "Select a player!" ]
+            case (getSelectedPlayer model) of
+                Just ( i, p ) ->
+                    Player.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
 
                 Nothing ->
                     Html.p [] [ Html.text "Select a player!" ]
+
+        actions =
+            case (getSelectedPlayer model) of
+                Just ( i, p ) ->
+                    Player.actionsFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
+
+                Nothing ->
+                    Html.p [] [ Html.text "Select a player!" ]
+
+        pickUp =
+            model.selectedPlayer
+                |> Maybe.map (\i -> (\a -> UsMsg <| Team.PickUp i a))
     in
         Html.div []
             [ Html.div [ Html.Attributes.class "ui between-rounds" ]
                 [ Html.div [ Html.Attributes.class "us" ]
                     [ Html.h1 [] [ Html.text ("US (" ++ (toString model.us.side) ++ ")") ]
-                    , Team.view (Just SelectPlayer) model.selectedPlayer model.us
+                    , Team.view (Just SelectPlayer) pickUp model.selectedPlayer model.us
                     ]
-                , menu
+                , Html.div [ Html.Attributes.class "menus" ]
+                    [ menu
+                    , actions
+                    ]
                 , Html.div [ Html.Attributes.class "them" ]
                     [ Html.h1 [] [ Html.text ("THEM (" ++ (toString model.them.side) ++ ")") ]
-                    , Team.view Nothing Nothing model.them
+                    , Team.view Nothing Nothing Nothing model.them
                     ]
                 ]
             , Html.button [ Html.Attributes.type_ "button", Html.Events.onClick BeginSimulation ] [ Html.text "Simulate!" ]
