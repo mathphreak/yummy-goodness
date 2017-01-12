@@ -157,4 +157,9 @@ view model =
                     ]
                 ]
             , Html.button [ Html.Attributes.type_ "button", Html.Events.onClick BeginSimulation ] [ Html.text "Simulate!" ]
+            , Html.node "link"
+                [ Html.Attributes.rel "stylesheet"
+                , Html.Attributes.href "style.css"
+                ]
+                []
             ]

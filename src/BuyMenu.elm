@@ -96,9 +96,9 @@ center backMsg team =
     let
         teamColor =
             if team == Equipment.CT then
-                "#0000DD"
+                "hsl(207, 30%, 30%)"
             else
-                "#DDAA00"
+                "hsl(45, 30%, 30%)"
 
         clickCenterAction =
             case backMsg of
