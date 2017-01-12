@@ -425,99 +425,103 @@ type alias WeaponStats =
     { cost : Int
     , killReward : Int
     , baseDamage : Int
-    , dps : Int
+    , ticksBetweenShots : Int
     }
+
+
+emptyStats =
+    WeaponStats 0 0 0 0
 
 
 stats : Equipment -> WeaponStats
 stats e =
     case e of
         Glock ->
-            WeaponStats 200 300 28 187
+            WeaponStats 200 300 28 10
 
         USPS ->
-            WeaponStats 200 300 35 206
+            WeaponStats 200 300 35 11
 
         P250 ->
-            WeaponStats 300 300 35 233
+            WeaponStats 300 300 35 10
 
         Deagle ->
-            WeaponStats 700 300 63 280
+            WeaponStats 700 300 63 14
 
         Berettas ->
-            WeaponStats 500 300 38 317
+            WeaponStats 500 300 38 8
 
         Tec9 ->
-            WeaponStats 500 300 33 275
+            WeaponStats 500 300 33 8
 
         FiveSeven ->
-            WeaponStats 500 300 32 213
+            WeaponStats 500 300 32 10
 
         Nova ->
-            WeaponStats 1200 900 (26 * 2) 266
+            WeaponStats 1200 900 (26 * 2) 56
 
         XM1014 ->
-            WeaponStats 2000 900 (20 * 2) 343
+            WeaponStats 2000 900 (20 * 2) 22
 
         SawedOff ->
-            WeaponStats 1200 900 (32 * 2) 301
+            WeaponStats 1200 900 (32 * 2) 54
 
         MAG7 ->
-            WeaponStats 1800 900 (30 * 2) 282
+            WeaponStats 1800 900 (30 * 2) 54
 
         MAC10 ->
-            WeaponStats 1050 600 29 387
+            WeaponStats 1050 600 29 5
 
         MP9 ->
-            WeaponStats 1250 600 26 371
+            WeaponStats 1250 600 26 4
 
         MP7 ->
-            WeaponStats 1700 600 29 363
+            WeaponStats 1700 600 29 5
 
         UMP45 ->
-            WeaponStats 1200 600 35 389
+            WeaponStats 1200 600 35 6
 
         PPBizon ->
-            WeaponStats 1400 600 27 338
+            WeaponStats 1400 600 27 5
 
         P90 ->
-            WeaponStats 2350 300 26 371
+            WeaponStats 2350 300 26 4
 
         GalilAR ->
-            WeaponStats 2000 300 30 333
+            WeaponStats 2000 300 30 6
 
         FAMAS ->
-            WeaponStats 2250 300 30 333
+            WeaponStats 2250 300 30 6
 
         AK47 ->
-            WeaponStats 2700 300 36 360
+            WeaponStats 2700 300 36 6
 
         M4A4 ->
-            WeaponStats 3100 300 33 367
+            WeaponStats 3100 300 33 6
 
         SSG08 ->
-            WeaponStats 1700 300 88 70
+            WeaponStats 1700 300 88 80
 
         SG553 ->
-            WeaponStats 3000 300 30 333
+            WeaponStats 3000 300 30 6
 
         AUG ->
-            WeaponStats 3300 300 28 311
+            WeaponStats 3300 300 28 6
 
         AWP ->
-            WeaponStats 4750 100 115 79
+            WeaponStats 4750 100 115 94
 
         G3SG1 ->
-            WeaponStats 5000 300 80 320
+            WeaponStats 5000 300 80 16
 
         SCAR20 ->
-            WeaponStats 5000 300 80 320
+            WeaponStats 5000 300 80 16
 
         M249 ->
-            WeaponStats 5200 300 32 400
+            WeaponStats 5200 300 32 5
 
         Negev ->
-            WeaponStats 5700 300 35 583
+            WeaponStats 5700 300 35 4
 
         Vest ->
             WeaponStats 650 0 0 0
@@ -533,10 +537,10 @@ stats e =
 
         -- shout out to https://www.youtube.com/watch?v=MbDkyndlQGk
         Molotov ->
-            WeaponStats 400 300 32 25
+            WeaponStats 400 300 32 0
 
         Incendiary ->
-            WeaponStats 600 300 32 25
+            WeaponStats 600 300 32 0
 
         Decoy ->
             WeaponStats 50 0 0 0

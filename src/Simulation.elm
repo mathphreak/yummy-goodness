@@ -10,6 +10,7 @@ import Array exposing (Array)
 import Maybe.Extra
 import Random exposing (..)
 import Random.Extra exposing (..)
+import Random.List
 
 
 -- MODEL
@@ -17,6 +18,7 @@ import Random.Extra exposing (..)
 
 type alias SimulatedPlayer =
     { health : Int
+    , cooldownLeft : Int
     , player : Player
     }
 
@@ -40,7 +42,7 @@ makeState ( us, them ) =
     let
         simPlayer : Player -> SimulatedPlayer
         simPlayer =
-            SimulatedPlayer 100
+            SimulatedPlayer 100 0
 
         simTeam : Team -> SimulatedTeam
         simTeam t =
@@ -75,7 +77,12 @@ breakState ( simUs, simThem ) =
                     ( 3250, 1400 )
 
                 EQ ->
-                    ( 3250, 1400 )
+                    case simUs.side of
+                        Equipment.CT ->
+                            ( 3250, 1400 )
+
+                        Equipment.T ->
+                            ( 1400, 3250 )
 
                 LT ->
                     ( 1400, 3250 )
@@ -109,50 +116,128 @@ getMatchup ( ourTeam, theirTeam ) ( u, t ) =
         Maybe.map2 (,) me you
 
 
-simulateMatchup : SimulatedMatchup -> Generator SimulatedMatchup
-simulateMatchup ( simMe, simYou ) =
+simulateTick : SimulatedMatchup -> Generator SimulatedMatchup
+simulateTick ( simMe, simYou ) =
     let
         me =
             simMe.player
 
-        myReward =
+        you =
+            simYou.player
+
+        myHealth =
+            simMe.health
+
+        yourHealth =
+            simYou.health
+
+        myOldCooldown =
+            simMe.cooldownLeft
+
+        yourOldCooldown =
+            simYou.cooldownLeft
+
+        myStats =
             me.primary
                 |> Maybe.Extra.or me.secondary
                 |> Maybe.map Equipment.stats
-                |> Maybe.map .killReward
-                |> Maybe.withDefault 0
+                |> Maybe.withDefault Equipment.emptyStats
+
+        yourStats =
+            you.primary
+                |> Maybe.Extra.or you.secondary
+                |> Maybe.map Equipment.stats
+                |> Maybe.withDefault Equipment.emptyStats
+
+        myDamage =
+            myStats.baseDamage
+
+        yourDamage =
+            yourStats.baseDamage
+
+        myWinCooldown =
+            myStats.ticksBetweenShots
+
+        yourWinCooldown =
+            yourStats.ticksBetweenShots
+
+        myLossCooldown =
+            clamp 0 myOldCooldown (myOldCooldown - 1)
+
+        yourLossCooldown =
+            clamp 0 yourOldCooldown (yourOldCooldown - 1)
+
+        myReward =
+            if myDamage >= yourHealth then
+                myStats.killReward
+            else
+                0
+
+        yourReward =
+            if yourDamage >= myHealth then
+                yourStats.killReward
+            else
+                0
 
         wonMe =
             { me | money = me.money + myReward }
 
         wonSimMe =
-            { simMe | player = wonMe }
+            { simMe | player = wonMe, cooldownLeft = myWinCooldown }
 
-        deadSimMe =
-            { simMe | health = 0 }
+        whiffSimMe =
+            { simMe | cooldownLeft = myLossCooldown }
 
-        you =
-            simYou.player
-
-        yourReward =
-            you.primary
-                |> Maybe.Extra.or you.secondary
-                |> Maybe.map Equipment.stats
-                |> Maybe.map .killReward
-                |> Maybe.withDefault 0
+        lostSimMe =
+            { simMe | health = myHealth - yourDamage, cooldownLeft = myLossCooldown }
 
         wonYou =
             { you | money = you.money + yourReward }
 
         wonSimYou =
-            { simYou | player = wonYou }
+            { simYou | player = wonYou, cooldownLeft = yourWinCooldown }
 
-        deadSimYou =
-            { simYou | health = 0 }
+        whiffSimYou =
+            { simYou | cooldownLeft = yourLossCooldown }
+
+        lostSimYou =
+            { simYou | health = yourHealth - myDamage, cooldownLeft = yourLossCooldown }
+
+        iWin =
+            if myOldCooldown > 0 then
+                Nothing
+            else
+                Just ( wonSimMe, lostSimYou )
+
+        youWin =
+            if yourOldCooldown > 0 then
+                Nothing
+            else
+                Just ( lostSimMe, wonSimYou )
+
+        nobodyWins =
+            ( whiffSimMe, whiffSimYou )
+
+        choices =
+            [ iWin, (Just nobodyWins), youWin ]
+                |> List.filterMap identity
     in
-        choice
-            ( wonSimMe, deadSimYou )
-            ( deadSimMe, wonSimYou )
+        Random.List.choose choices
+            |> map (\( result, _ ) -> (Maybe.withDefault nobodyWins result))
+
+
+simulateMatchup : SimulatedMatchup -> Generator SimulatedMatchup
+simulateMatchup state =
+    let
+        nextTick : Int -> SimulatedMatchup -> Generator SimulatedMatchup
+        nextTick i ( simMe, simYou ) =
+            if (i < 0) || (simMe.health <= 0) || (simYou.health <= 0) then
+                constant ( simMe, simYou )
+            else
+                simulateTick ( simMe, simYou )
+                    |> andThen (nextTick (i - 1))
+    in
+        nextTick (.ticksBetweenShots (Equipment.stats Equipment.AWP)) state
 
 
 applyMatchup : SimulationState -> ( Int, Int ) -> SimulatedMatchup -> SimulationState
