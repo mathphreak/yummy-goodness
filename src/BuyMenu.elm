@@ -243,5 +243,5 @@ buyMenuFor wrapMsg player =
                     (\a -> wrapMsg <| Player.Purchase a)
                     canPurchase
                     player.team
-                    (List.member Equipment.Vest player.gear)
+                    (Player.hasArmor player)
                     ((Equipment.listFor submenu) |> List.filter canUse)

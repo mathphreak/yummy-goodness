@@ -9,6 +9,7 @@ import Random exposing (..)
 import Random.Extra exposing (..)
 import Random.List
 import Tuple2
+import Debug
 
 
 -- MODEL
@@ -169,8 +170,19 @@ simulateTick ( simMe, simYou, log ) =
         stats =
             gun |> Tuple2.mapBoth Tuple.second
 
+        hasArmor =
+            self |> Tuple2.mapBoth Player.hasArmor
+
+        calculateDamage ( stats, enemyHasArmor ) =
+            if enemyHasArmor then
+                round (toFloat stats.baseDamage * stats.armorPenetration / 100)
+            else
+                stats.baseDamage
+
         damage =
-            stats |> Tuple2.mapBoth .baseDamage
+            Tuple2.swap hasArmor
+                |> commingle stats
+                |> Tuple2.mapBoth calculateDamage
 
         winCooldown =
             stats |> Tuple2.mapBoth .ticksBetweenShots
@@ -178,14 +190,16 @@ simulateTick ( simMe, simYou, log ) =
         lossCooldown =
             oldCooldown |> Tuple2.mapBoth (\c -> clamp 0 c (c - 1))
 
-        calculateReward ( this, that, this2 ) =
-            if (this damage) >= (that health) then
-                .killReward (this2 stats)
+        calculateReward ( stats, ( damage, enemyHealth ) ) =
+            if damage >= enemyHealth then
+                stats.killReward
             else
                 0
 
         reward =
-            ( ( my, your, my ), ( your, my, your ) )
+            Tuple2.swap health
+                |> commingle damage
+                |> commingle stats
                 |> Tuple2.mapBoth calculateReward
 
         wonSelf =

@@ -24,6 +24,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - In each matchup, one player kills the other while taking no damage
     - This happens five times per round but skips if one player is dead
     - Weapon damage exists
+    - Armor is a thing
     - Round win/loss bonus exists
     - Weapon kill rewards are a thing
     - Show killfeed (UI: ☹️)
@@ -33,7 +34,6 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Explain some things
 - Enemies buy things competently
 - Simulate rounds of game
-    - Armor is a thing
     - Matchups are better
     - Lose or win rounds based on real things
     - Switch sides at halftime

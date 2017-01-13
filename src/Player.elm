@@ -3,6 +3,7 @@ module Player
         ( Player
         , newPlayer
         , dead
+        , hasArmor
         , Msg(..)
         , update
         , actionsFor
@@ -63,6 +64,12 @@ dead p =
         { p | secondary = Just pistol, primary = Nothing, gear = [], grenades = [] }
 
 
+hasArmor : Player -> Bool
+hasArmor p =
+    List.member Equipment.Vest p.gear
+        || List.member Equipment.VestHelmet p.gear
+
+
 
 -- UPDATE
 
@@ -81,7 +88,7 @@ update msg origPlayer =
         Purchase item ->
             let
                 cost =
-                    if item == Equipment.VestHelmet && (List.member Equipment.Vest origPlayer.gear) then
+                    if item == Equipment.VestHelmet && (hasArmor origPlayer) then
                         350
                     else
                         Equipment.cost item
