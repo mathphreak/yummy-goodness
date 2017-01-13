@@ -1,10 +1,11 @@
-module BuyMenu exposing (viewMenu, viewSubmenu)
+module BuyMenu exposing (buyMenuFor)
 
 import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Equipment exposing (Equipment)
+import Player exposing (Player, Msg)
 
 
 -- VIEW
@@ -155,12 +156,18 @@ viewSix backMsg msg canPurchase team inv =
             )
 
 
-viewFour : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> List Equipment -> Html msg
-viewFour backMsg msg canPurchase team inv =
+viewFour : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> Bool -> List Equipment -> Html msg
+viewFour backMsg msg canPurchase team hasVest inv =
     let
+        cost e =
+            if e == Equipment.VestHelmet && hasVest then
+                350
+            else
+                Equipment.cost e
+
         buildItem i e =
             { index = (i + 1)
-            , cost = "$" ++ (toString (Equipment.cost e))
+            , cost = "$" ++ (toString (cost e))
             , name = Equipment.toString e
             , action = Just (msg e)
             , enabled = canPurchase e
@@ -185,12 +192,12 @@ viewFour backMsg msg canPurchase team inv =
             )
 
 
-viewSubmenu : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> List Equipment -> Html msg
-viewSubmenu backMsg msg canPurchase team inv =
+viewSubmenu : msg -> (Equipment -> msg) -> (Equipment -> Bool) -> Equipment.Side -> Bool -> List Equipment -> Html msg
+viewSubmenu backMsg msg canPurchase team hasVest inv =
     if (List.length inv) > 4 then
         (viewSix backMsg msg canPurchase team inv)
     else
-        (viewFour backMsg msg canPurchase team inv)
+        (viewFour backMsg msg canPurchase team hasVest inv)
 
 
 viewMenu : (Equipment.Submenu -> msg) -> (Equipment -> Bool) -> Equipment.Side -> Html msg
@@ -212,3 +219,29 @@ viewMenu msg canPurchase team =
                    , center Nothing team
                    ]
             )
+
+
+buyMenuFor : (Msg -> msg) -> Player -> Html msg
+buyMenuFor wrapMsg player =
+    let
+        canPurchase =
+            Player.playerCanPurchaseEquipment player
+
+        canUse =
+            Player.playerCanUseEquipment player
+    in
+        case player.submenu of
+            Nothing ->
+                viewMenu
+                    (\a -> (wrapMsg <| Player.MenuSelect <| Just a))
+                    canPurchase
+                    player.team
+
+            Just submenu ->
+                viewSubmenu
+                    (wrapMsg <| Player.MenuSelect Nothing)
+                    (\a -> wrapMsg <| Player.Purchase a)
+                    canPurchase
+                    player.team
+                    (List.member Equipment.Vest player.gear)
+                    ((Equipment.listFor submenu) |> List.filter canUse)

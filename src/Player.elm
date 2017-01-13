@@ -5,8 +5,8 @@ module Player
         , dead
         , Msg(..)
         , update
-        , buyMenuFor
         , actionsFor
+        , playerCanUseEquipment
         , playerCanPurchaseEquipment
         , view
         )
@@ -16,7 +16,6 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import String
-import BuyMenu
 import Maybe.Extra
 
 
@@ -81,8 +80,14 @@ update msg origPlayer =
     case msg of
         Purchase item ->
             let
+                cost =
+                    if item == Equipment.VestHelmet && (List.member Equipment.Vest origPlayer.gear) then
+                        350
+                    else
+                        Equipment.cost item
+
                 newMoney =
-                    origPlayer.money - (Equipment.cost item)
+                    origPlayer.money - cost
 
                 player =
                     { origPlayer | money = newMoney, submenu = Nothing }
@@ -168,31 +173,6 @@ playerCanPurchaseEquipment p e =
         False
     else
         True
-
-
-buyMenuFor : (Msg -> msg) -> Player -> Html msg
-buyMenuFor wrapMsg player =
-    let
-        canPurchase =
-            playerCanPurchaseEquipment player
-
-        canUse =
-            playerCanUseEquipment player
-    in
-        case player.submenu of
-            Nothing ->
-                BuyMenu.viewMenu
-                    (\a -> (wrapMsg <| MenuSelect <| Just a))
-                    canPurchase
-                    player.team
-
-            Just submenu ->
-                BuyMenu.viewSubmenu
-                    (wrapMsg <| MenuSelect Nothing)
-                    (\a -> wrapMsg <| Purchase a)
-                    canPurchase
-                    player.team
-                    ((Equipment.listFor submenu) |> List.filter canUse)
 
 
 actionsFor : (Msg -> msg) -> Player -> Html msg

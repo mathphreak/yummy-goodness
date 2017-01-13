@@ -30,7 +30,6 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 ## TODO
 
 - Explain some things
-- Helmet costs less if vest already owned
 - Show killfeed
 - Difficulty settings
     - Don't show enemy equipment from last round

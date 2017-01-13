@@ -126,7 +126,7 @@ view model =
         menu =
             case (getSelectedPlayer model) of
                 Just ( i, p ) ->
-                    Player.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
+                    BuyMenu.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
 
                 Nothing ->
                     Html.p [] [ Html.text "Select a player!" ]
