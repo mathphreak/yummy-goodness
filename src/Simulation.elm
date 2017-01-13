@@ -1,7 +1,4 @@
-module Simulation
-    exposing
-        ( simulate
-        )
+module Simulation exposing (simulate)
 
 import Player exposing (Player)
 import Equipment exposing (Equipment)
@@ -35,11 +32,17 @@ type alias SimulatedTeam =
 
 
 type alias SimulatedMatchup =
-    ( SimulatedPlayer, SimulatedPlayer, Log )
+    ( SimulatedPlayer, SimulatedPlayer, String )
 
 
 type alias SimulationState =
     ( SimulatedTeam, SimulatedTeam, Log )
+
+
+
+{- I'm not sure if they give out trophies for Most Unnecessary Type Annotation,
+   but if they do I think this should get one
+-}
 
 
 commingle : ( a, b ) -> ( x, y ) -> ( ( a, x ), ( b, y ) )
@@ -58,7 +61,7 @@ makeState ( us, them ) =
         simTeam t =
             SimulatedTeam t.side (Array.map simPlayer t.players)
     in
-        ( simTeam us, simTeam them, [ "The Round Started!" ] )
+        ( simTeam us, simTeam them, [] )
 
 
 breakState : SimulationState -> ( Team, Team, Log )
@@ -123,7 +126,7 @@ getMatchup ( ourTeam, theirTeam, log ) ( u, t ) =
             Array.get t theirTeam.players
                 |> Maybe.andThen playerIfAlive
     in
-        Maybe.map3 (,,) me you (Just [])
+        Maybe.map3 (,,) me you (Just "")
 
 
 simulateTick : SimulatedMatchup -> Generator SimulatedMatchup
@@ -215,7 +218,7 @@ simulateTick ( simMe, simYou, log ) =
             else
                 ( my wonSim
                 , your lostSim
-                , (me.name ++ " shot " ++ you.name ++ " for " ++ (toString (my damage)) ++ " with " ++ (Tuple.first (my gun))) :: log
+                , (me.name ++ " killed " ++ you.name ++ " with " ++ (Tuple.first (my gun)))
                 )
 
         youWin =
@@ -224,7 +227,7 @@ simulateTick ( simMe, simYou, log ) =
             else
                 ( my lostSim
                 , your wonSim
-                , (you.name ++ " shot " ++ me.name ++ " for " ++ (toString (your damage)) ++ " with " ++ (Tuple.first (your gun))) :: log
+                , (you.name ++ " killed " ++ me.name ++ " with " ++ (Tuple.first (your gun)))
                 )
 
         choices =
@@ -263,7 +266,7 @@ applyMatchup ( ourTeam, theirTeam, log ) ( u, t ) ( newSimMe, newSimYou, newLog 
         newTheirTeam =
             { theirTeam | players = newThem }
     in
-        ( newOurTeam, newTheirTeam, newLog ++ log )
+        ( newOurTeam, newTheirTeam, newLog :: log )
 
 
 grabAndRunMatchup : SimulationState -> ( Int, Int ) -> Generator SimulationState

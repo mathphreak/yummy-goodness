@@ -26,16 +26,12 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Weapon damage exists
     - Round win/loss bonus exists
     - Weapon kill rewards are a thing
+    - Show killfeed (UI: ☹️)
 
 ## TODO
 
 - Explain some things
-- Show killfeed
-- Difficulty settings
-    - Don't show enemy equipment from last round
-    - Time limit for purchases
-    - Enemies buy things competently
-    - Players don't always do what you say
+- Enemies buy things competently
 - Simulate rounds of game
     - Armor is a thing
     - Matchups are better
