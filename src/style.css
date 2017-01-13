@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700');
-
 .wedge:hover path {
     fill: rebeccapurple;
 }
@@ -23,11 +22,19 @@ svg a.link {
 }
 
 .ui {
-    display: flex;
-    flex-flow: row;
-    width: 100%;
-    justify-content: space-between;
     margin-top: 2em;
+    display: flex;
+    width: 100%;
+}
+
+.ui.inGame {
+    flex-flow: row;
+    justify-content: space-between;
+}
+
+.ui.afterGame {
+    flex-flow: column;
+    align-items: center;
 }
 
 .us, .them {
@@ -103,6 +110,7 @@ body {
     box-sizing: border-box;
     border: 1px solid black;
     border-right-width: 0;
+    background-color: white;
 }
 
 .rounds li:last-child {
@@ -122,13 +130,12 @@ body {
 }
 
 @keyframes next-pulse {
-  from {
-    background-position: 0%;
-  }
-
-  to {
-    background-position: 100%;
-  }
+    from {
+        background-position: 0%;
+    }
+    to {
+        background-position: 100%;
+    }
 }
 
 .rounds .next button {
@@ -146,12 +153,12 @@ body {
     animation: 2s next-pulse infinite alternate;
 }
 
-.rounds .win:nth-last-child(2) + .next button {
+.rounds .win:nth-last-child(2)+.next button {
     background: linear-gradient(to right, hsl(120, 100%, 75%), hsl(120, 0%, 75%));
     background-size: 150% auto;
 }
 
-.rounds .loss:nth-last-child(2) + .next button {
+.rounds .loss:nth-last-child(2)+.next button {
     background: linear-gradient(to right, hsl(0, 100%, 75%), hsl(0, 0%, 75%));
     background-size: 150% auto;
 }
@@ -169,7 +176,7 @@ body {
     opacity: 0.25;
 }
 
-.killFeed > div {
+.killFeed>div {
     pointer-events: none;
     background: #292929;
     padding: 3px 6px 3px 6px;
@@ -184,7 +191,7 @@ body {
     border-radius: 4px;
 }
 
-.killFeed > div:nth-child(n+2) {
+.killFeed>div:nth-child(n+2) {
     margin-top: 2px;
 }
 

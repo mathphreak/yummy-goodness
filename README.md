@@ -23,6 +23,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Simulate rounds of game (UI: 🙂)
     - In each matchup, players shoot at each other as fast as their most primary weapons will allow
     - This happens anywhere from 3 to 20 times per round but skips if one player is dead
+    - Game ends after 15 rounds, so it simulates one half of a full CS:GO match
     - Weapon damage exists
     - Armor is a thing
     - Round win/loss bonus exists and increases for losing streaks
@@ -37,7 +38,6 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Simulate rounds of game
     - Matchups are better handled
     - Plant and defuse the bomb
-    - End game after 15 rounds (switching sides is too complicated)
     - Pick up enemy weapons sometimes
-    - Accuracy and recoil are real
+    - Sometimes shots miss
 - Appease the gods of line length and dead code

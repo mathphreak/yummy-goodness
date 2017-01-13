@@ -58,6 +58,7 @@ type Msg
     | SelectPlayer Int
     | BeginSimulation
     | EndSimulation ( Team, Team, KillFeed, Equipment.Side )
+    | Reset
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -110,6 +111,9 @@ update msg model =
               }
             , Cmd.none
             )
+
+        Reset ->
+            init
 
 
 
@@ -186,51 +190,101 @@ nextRoundButton winners =
         []
 
 
-view : Model -> Html Msg
-view model =
+historyPanel : Model -> Html Msg
+historyPanel model =
+    Html.div [ Html.Attributes.class "history" ]
+        [ Html.ul [ Html.Attributes.class "rounds" ]
+            ((historySummary model.us.side model.roundWinners)
+                ++ (showHistory model.us.side model.roundWinners)
+                ++ (nextRoundButton model.roundWinners)
+            )
+        ]
+
+
+menuPanel : Model -> Html Msg
+menuPanel model =
     let
         menu =
             case (getSelectedPlayer model) of
                 Just ( i, p ) ->
-                    BuyMenu.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
+                    [ BuyMenu.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p ]
 
                 Nothing ->
-                    Html.p [] [ Html.text "Select a player!" ]
+                    [ Html.p [] [ Html.text "Select a player!" ] ]
 
         actions =
             case (getSelectedPlayer model) of
                 Just ( i, p ) ->
-                    Player.actionsFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p
+                    [ Player.actionsFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p ]
 
                 Nothing ->
-                    Html.p [] [ Html.text "Select a player!" ]
+                    []
+    in
+        Html.div [ Html.Attributes.class "menus" ] (menu ++ actions)
 
+
+uiPanel : Model -> Html Msg
+uiPanel model =
+    let
         pickUp =
             model.selectedPlayer
                 |> Maybe.map (\i -> (\a -> UsMsg <| Team.PickUp i a))
     in
-        Html.div []
-            [ Html.div [ Html.Attributes.class "history" ]
-                [ Html.ul [ Html.Attributes.class "rounds" ]
-                    ((historySummary model.us.side model.roundWinners)
-                        ++ (showHistory model.us.side model.roundWinners)
-                        ++ (nextRoundButton model.roundWinners)
-                    )
+        Html.div [ Html.Attributes.class "ui inGame" ]
+            [ Html.div [ Html.Attributes.class "us" ]
+                [ Html.h1 [] [ Html.text ("US (" ++ (toString model.us.side) ++ ")") ]
+                , Team.view (Just SelectPlayer) pickUp model.selectedPlayer model.us
                 ]
-            , Html.div [ Html.Attributes.class "menus" ]
-                [ menu
-                , actions
+            , Html.div [ Html.Attributes.class "them" ]
+                [ Html.h1 [] [ Html.text ("THEM (" ++ (toString model.them.side) ++ ")") ]
+                , Team.view Nothing Nothing Nothing model.them
                 ]
-            , (KillFeed.view model.killFeed)
-            , Html.div [ Html.Attributes.class "ui" ]
-                [ Html.div [ Html.Attributes.class "us" ]
-                    [ Html.h1 [] [ Html.text ("US (" ++ (toString model.us.side) ++ ")") ]
-                    , Team.view (Just SelectPlayer) pickUp model.selectedPlayer model.us
-                    ]
-                , Html.div [ Html.Attributes.class "them" ]
-                    [ Html.h1 [] [ Html.text ("THEM (" ++ (toString model.them.side) ++ ")") ]
-                    , Team.view Nothing Nothing Nothing model.them
-                    ]
-                ]
-            , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
             ]
+
+
+gameInProgressView : Model -> List (Html Msg)
+gameInProgressView model =
+    [ menuPanel model, uiPanel model ]
+
+
+gameOverView : Model -> List (Html Msg)
+gameOverView model =
+    let
+        ourWins =
+            model.roundWinners
+                |> List.filter ((==) model.us.side)
+                |> List.length
+
+        message =
+            if ourWins > 7 then
+                "You Won!"
+            else
+                "You lost."
+    in
+        [ Html.div [ Html.Attributes.class "ui afterGame" ]
+            [ Html.h1 [] [ Html.text "Game Over!" ]
+            , Html.h2 [] [ Html.text message ]
+            , Html.button [ Html.Events.onClick Reset ] [ Html.text "Restart?" ]
+            ]
+        ]
+
+
+view : Model -> Html Msg
+view model =
+    let
+        gameOver =
+            (List.length model.roundWinners) >= 15
+
+        subview =
+            if gameOver then
+                gameOverView
+            else
+                gameInProgressView
+    in
+        Html.div []
+            ([ historyPanel model
+             , KillFeed.view model.killFeed
+             , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
+             ]
+                ++ subview model
+            )
