@@ -34,7 +34,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 ## TODO
 
 - Explain some things
-- Enemies buy things competently
+- Enemies buy things more competently
 - Simulate rounds of game
     - Matchups are better handled
     - Plant and defuse the bomb

@@ -315,11 +315,11 @@ aiEnemyPurchase them =
         them
             |> purchaseIfPossible Equipment.VestHelmet
             |> purchaseIfPossible Equipment.Vest
-            |> purchaseIfPossible Equipment.AWP
+            |> purchaseIfPossible Equipment.Deagle
+            |> purchaseIfPossible Equipment.XM1014
             |> purchaseIfPossible Equipment.AK47
             |> purchaseIfPossible Equipment.M4A4
-            |> purchaseIfPossible Equipment.XM1014
-            |> purchaseIfPossible Equipment.Deagle
+            |> purchaseIfPossible Equipment.AWP
             |> purchaseIfPossible Equipment.Smoke
 
 
