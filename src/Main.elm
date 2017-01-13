@@ -11,6 +11,7 @@ import Random
 import BotNames
 import BuyMenu
 import Simulation
+import KillFeed exposing (KillFeed)
 
 
 main =
@@ -30,7 +31,7 @@ type alias Model =
     { us : Team
     , them : Team
     , selectedPlayer : Maybe Int
-    , log : List String
+    , killFeed : KillFeed
     , roundWinners : List Equipment.Side
     }
 
@@ -41,7 +42,7 @@ init =
         (Team.buildTeam Equipment.CT Array.empty)
         (Team.buildTeam Equipment.CT Array.empty)
         Nothing
-        [ "Waiting for RNG to load in..." ]
+        []
         []
     , Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool)
     )
@@ -56,7 +57,7 @@ type Msg
     | UsMsg Team.Msg
     | SelectPlayer Int
     | BeginSimulation
-    | EndSimulation ( Team, Team, List String, Equipment.Side )
+    | EndSimulation ( Team, Team, KillFeed, Equipment.Side )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -99,12 +100,12 @@ update msg model =
         BeginSimulation ->
             ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them )) )
 
-        EndSimulation ( us, them, log, winner ) ->
+        EndSimulation ( us, them, killFeed, winner ) ->
             ( { model
                 | us = us
                 , them = them
                 , selectedPlayer = Nothing
-                , log = List.reverse log
+                , killFeed = killFeed
                 , roundWinners = model.roundWinners ++ [ winner ]
               }
             , Cmd.none
@@ -192,6 +193,7 @@ view model =
                 [ menu
                 , actions
                 ]
+            , (KillFeed.view model.killFeed)
             , Html.div [ Html.Attributes.class "ui" ]
                 [ Html.div [ Html.Attributes.class "us" ]
                     [ Html.h1 [] [ Html.text ("US (" ++ (toString model.us.side) ++ ")") ]
@@ -202,10 +204,5 @@ view model =
                     , Team.view Nothing Nothing Nothing model.them
                     ]
                 ]
-            , Html.ul [] (List.map (\l -> Html.li [] [ Html.text l ]) model.log)
-            , Html.node "link"
-                [ Html.Attributes.rel "stylesheet"
-                , Html.Attributes.href "style.css"
-                ]
-                []
+            , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
             ]

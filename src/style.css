@@ -155,3 +155,55 @@ body {
     background: linear-gradient(to right, hsl(0, 100%, 75%), hsl(0, 0%, 75%));
     background-size: 150% auto;
 }
+
+.killFeed {
+    position: fixed;
+    right: 0.5em;
+    top: 0.5em;
+    text-align: right;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.killFeed:hover {
+    opacity: 0.25;
+}
+
+.killFeed > div {
+    pointer-events: none;
+    background: #292929;
+    padding: 3px 6px 3px 6px;
+    margin: 0;
+    display: inline-block;
+    float: right;
+    clear: both;
+    border: 2px #800000 solid;
+    font-weight: normal;
+    text-decoration: none;
+    text-align: right;
+    border-radius: 4px;
+}
+
+.killFeed > div:nth-child(n+2) {
+    margin-top: 2px;
+}
+
+.killFeed img {
+    height: 16px;
+}
+
+.playerName:first-child {
+    padding-right: 3px;
+}
+
+.playerName:last-child {
+    padding-left: 3px;
+}
+
+.playerName.ct {
+    color: #4F9EDE;
+}
+
+.playerName.t {
+    color: #C7A247;
+}

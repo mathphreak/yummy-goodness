@@ -28,7 +28,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Round win/loss bonus exists
     - Weapon kill rewards are a thing
     - Remember who won which round (UI: 🙂🙂)
-    - Show kill feed (UI: ☹️, text makes me sad)
+    - Show kill feed (UI: 🙂 with images and colors blatantly stolen from http://tools.dathost.net/killfeed-generator/)
 
 ## TODO
 

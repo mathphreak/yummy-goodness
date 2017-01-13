@@ -10,6 +10,7 @@ import Random.Extra exposing (..)
 import Random.List
 import Tuple2
 import Debug
+import KillFeed exposing (KillFeed, KillFeedEntry)
 
 
 -- MODEL
@@ -22,10 +23,6 @@ type alias SimulatedPlayer =
     }
 
 
-type alias Log =
-    List String
-
-
 type alias SimulatedTeam =
     { side : Equipment.Side
     , players : Array SimulatedPlayer
@@ -33,11 +30,11 @@ type alias SimulatedTeam =
 
 
 type alias SimulatedMatchup =
-    ( SimulatedPlayer, SimulatedPlayer, String )
+    ( SimulatedPlayer, SimulatedPlayer, Maybe KillFeedEntry )
 
 
 type alias SimulationState =
-    ( SimulatedTeam, SimulatedTeam, Log )
+    ( SimulatedTeam, SimulatedTeam, KillFeed )
 
 
 
@@ -65,8 +62,8 @@ makeState ( us, them ) =
         ( simTeam us, simTeam them, [] )
 
 
-breakState : SimulationState -> ( Team, Team, Log, Equipment.Side )
-breakState ( simUs, simThem, log ) =
+breakState : SimulationState -> ( Team, Team, KillFeed, Equipment.Side )
+breakState ( simUs, simThem, feed ) =
     let
         breakPlayer : Int -> SimulatedPlayer -> Player
         breakPlayer bonus p =
@@ -107,7 +104,7 @@ breakState ( simUs, simThem, log ) =
             in
                 Team t.side (Array.map (breakPlayer reward) t.players) Array.empty
     in
-        ( breakTeam simUs, breakTeam simThem, log, winningTeam )
+        ( breakTeam simUs, breakTeam simThem, feed, winningTeam )
 
 
 playerIfAlive : SimulatedPlayer -> Maybe SimulatedPlayer
@@ -119,7 +116,7 @@ playerIfAlive p =
 
 
 getMatchup : SimulationState -> ( Int, Int ) -> Maybe SimulatedMatchup
-getMatchup ( ourTeam, theirTeam, log ) ( u, t ) =
+getMatchup ( ourTeam, theirTeam, feed ) ( u, t ) =
     let
         me =
             Array.get u ourTeam.players
@@ -129,11 +126,11 @@ getMatchup ( ourTeam, theirTeam, log ) ( u, t ) =
             Array.get t theirTeam.players
                 |> Maybe.andThen playerIfAlive
     in
-        Maybe.map3 (,,) me you (Just "")
+        Maybe.map3 (,,) me you (Just Nothing)
 
 
 simulateTick : SimulatedMatchup -> Generator SimulatedMatchup
-simulateTick ( simMe, simYou, log ) =
+simulateTick ( simMe, simYou, _ ) =
     let
         me =
             simMe.player
@@ -159,18 +156,17 @@ simulateTick ( simMe, simYou, log ) =
         oldCooldown =
             simSelf |> Tuple2.mapBoth .cooldownLeft
 
-        getGun : Player -> ( String, Equipment.WeaponStats )
+        getGun : Player -> Equipment
         getGun p =
             p.secondary
                 |> Maybe.Extra.or p.primary
-                |> Maybe.map (\e -> ( Equipment.toString e, Equipment.stats e ))
-                |> Maybe.withDefault ( "Nothing", Equipment.emptyStats )
+                |> Maybe.withDefault Equipment.Vest
 
         gun =
             self |> Tuple2.mapBoth getGun
 
         stats =
-            gun |> Tuple2.mapBoth Tuple.second
+            gun |> Tuple2.mapBoth Equipment.stats
 
         hasArmor =
             self |> Tuple2.mapBoth Player.hasArmor
@@ -226,7 +222,7 @@ simulateTick ( simMe, simYou, log ) =
                 |> Tuple2.mapBoth (\( ( sS, lC ), ( h, d ) ) -> { sS | health = h - d, cooldownLeft = lC })
 
         nobodyWins =
-            ( my whiffSim, your whiffSim, log )
+            ( my whiffSim, your whiffSim, Nothing )
 
         iWin =
             if (my oldCooldown) > 0 then
@@ -234,7 +230,7 @@ simulateTick ( simMe, simYou, log ) =
             else
                 ( my wonSim
                 , your lostSim
-                , (me.name ++ " killed " ++ you.name ++ " with " ++ (Tuple.first (my gun)))
+                , Just (KillFeedEntry me you (my gun))
                 )
 
         youWin =
@@ -243,7 +239,7 @@ simulateTick ( simMe, simYou, log ) =
             else
                 ( my lostSim
                 , your wonSim
-                , (you.name ++ " killed " ++ me.name ++ " with " ++ (Tuple.first (your gun)))
+                , Just (KillFeedEntry you me (your gun))
                 )
 
         choices =
@@ -257,18 +253,18 @@ simulateMatchup : SimulatedMatchup -> Generator SimulatedMatchup
 simulateMatchup state =
     let
         nextTick : Int -> SimulatedMatchup -> Generator SimulatedMatchup
-        nextTick i ( simMe, simYou, log ) =
+        nextTick i ( simMe, simYou, kill ) =
             if (i < 0) || (simMe.health <= 0) || (simYou.health <= 0) then
-                constant ( simMe, simYou, log )
+                constant ( simMe, simYou, kill )
             else
-                simulateTick ( simMe, simYou, log )
+                simulateTick ( simMe, simYou, kill )
                     |> andThen (nextTick (i - 1))
     in
         nextTick (.ticksBetweenShots (Equipment.stats Equipment.AWP)) state
 
 
 applyMatchup : SimulationState -> ( Int, Int ) -> SimulatedMatchup -> SimulationState
-applyMatchup ( ourTeam, theirTeam, log ) ( u, t ) ( newSimMe, newSimYou, newLog ) =
+applyMatchup ( ourTeam, theirTeam, feed ) ( u, t ) ( newSimMe, newSimYou, newKill ) =
     let
         newUs =
             Array.set u newSimMe ourTeam.players
@@ -282,7 +278,7 @@ applyMatchup ( ourTeam, theirTeam, log ) ( u, t ) ( newSimMe, newSimYou, newLog 
         newTheirTeam =
             { theirTeam | players = newThem }
     in
-        ( newOurTeam, newTheirTeam, newLog :: log )
+        ( newOurTeam, newTheirTeam, feed ++ (Maybe.Extra.maybeToList newKill) )
 
 
 grabAndRunMatchup : SimulationState -> ( Int, Int ) -> Generator SimulationState
@@ -333,7 +329,7 @@ runEnemyAI theirTeam =
         { theirTeam | players = players }
 
 
-simulate : ( Team, Team ) -> Generator ( Team, Team, Log, Equipment.Side )
+simulate : ( Team, Team ) -> Generator ( Team, Team, KillFeed, Equipment.Side )
 simulate ( ourTeam, theirTeam ) =
     let
         runStepsFrom n =
