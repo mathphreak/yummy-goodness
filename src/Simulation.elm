@@ -46,8 +46,8 @@ type alias SimulationState =
 -}
 
 
-commingle : ( a, b ) -> ( x, y ) -> ( ( a, x ), ( b, y ) )
-commingle ( a, b ) ( x, y ) =
+zip2 : ( a, b ) -> ( x, y ) -> ( ( a, x ), ( b, y ) )
+zip2 ( a, b ) ( x, y ) =
     ( ( a, x ), ( b, y ) )
 
 
@@ -65,7 +65,7 @@ makeState ( us, them ) =
         ( simTeam us, simTeam them, [] )
 
 
-breakState : SimulationState -> ( Team, Team, Log )
+breakState : SimulationState -> ( Team, Team, Log, Equipment.Side )
 breakState ( simUs, simThem, log ) =
     let
         breakPlayer : Int -> SimulatedPlayer -> Player
@@ -85,27 +85,29 @@ breakState ( simUs, simThem, log ) =
                 |> Array.filter (\p -> p.health > 0)
                 |> Array.length
 
-        rewards =
+        winningTeam =
             case (compare (countAlive simUs) (countAlive simThem)) of
                 GT ->
-                    ( 3250, 1400 )
+                    simUs.side
 
                 EQ ->
-                    case simUs.side of
-                        Equipment.CT ->
-                            ( 3250, 1400 )
-
-                        Equipment.T ->
-                            ( 1400, 3250 )
+                    Equipment.CT
 
                 LT ->
-                    ( 1400, 3250 )
+                    simThem.side
 
-        breakTeam : Int -> SimulatedTeam -> Team
-        breakTeam reward t =
-            Team t.side (Array.map (breakPlayer reward) t.players) Array.empty
+        breakTeam : SimulatedTeam -> Team
+        breakTeam t =
+            let
+                reward =
+                    if t.side == winningTeam then
+                        3250
+                    else
+                        1400
+            in
+                Team t.side (Array.map (breakPlayer reward) t.players) Array.empty
     in
-        ( breakTeam (Tuple.first rewards) simUs, breakTeam (Tuple.second rewards) simThem, log )
+        ( breakTeam simUs, breakTeam simThem, log, winningTeam )
 
 
 playerIfAlive : SimulatedPlayer -> Maybe SimulatedPlayer
@@ -181,7 +183,7 @@ simulateTick ( simMe, simYou, log ) =
 
         damage =
             Tuple2.swap hasArmor
-                |> commingle stats
+                |> zip2 stats
                 |> Tuple2.mapBoth calculateDamage
 
         winCooldown =
@@ -198,29 +200,29 @@ simulateTick ( simMe, simYou, log ) =
 
         reward =
             Tuple2.swap health
-                |> commingle damage
-                |> commingle stats
+                |> zip2 damage
+                |> zip2 stats
                 |> Tuple2.mapBoth calculateReward
 
         wonSelf =
             reward
-                |> commingle self
+                |> zip2 self
                 |> Tuple2.mapBoth (\( s, r ) -> { s | money = s.money + r })
 
         wonSim =
             wonSelf
-                |> commingle winCooldown
-                |> commingle simSelf
+                |> zip2 winCooldown
+                |> zip2 simSelf
                 |> Tuple2.mapBoth (\( s, ( c, p ) ) -> { s | player = p, cooldownLeft = c })
 
         whiffSim =
             simSelf
-                |> commingle lossCooldown
+                |> zip2 lossCooldown
                 |> Tuple2.mapBoth (\( c, s ) -> { s | cooldownLeft = c })
 
         lostSim =
-            commingle health (Tuple2.swap damage)
-                |> commingle (commingle simSelf lossCooldown)
+            zip2 health (Tuple2.swap damage)
+                |> zip2 (zip2 simSelf lossCooldown)
                 |> Tuple2.mapBoth (\( ( sS, lC ), ( h, d ) ) -> { sS | health = h - d, cooldownLeft = lC })
 
         nobodyWins =
@@ -331,7 +333,7 @@ runEnemyAI theirTeam =
         { theirTeam | players = players }
 
 
-simulate : ( Team, Team ) -> Generator ( Team, Team, Log )
+simulate : ( Team, Team ) -> Generator ( Team, Team, Log, Equipment.Side )
 simulate ( ourTeam, theirTeam ) =
     let
         runStepsFrom n =

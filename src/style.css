@@ -27,6 +27,7 @@ svg a.link {
     flex-flow: row;
     width: 100%;
     justify-content: space-between;
+    margin-top: 2em;
 }
 
 .us, .them {
@@ -74,8 +75,83 @@ body {
 
 .menus {
     position: fixed;
-    top: 0;
+    top: 2em;
     left: calc(50% - 150px);
     width: 300px;
     text-align: center;
+}
+
+.history {
+    height: 2em;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.rounds {
+    padding: 0;
+    margin: 0;
+}
+
+.rounds li {
+    display: inline-block;
+    list-style-type: none;
+    height: 2em;
+    width: 3em;
+    text-align: center;
+    line-height: 2em;
+    box-sizing: border-box;
+    border: 1px solid black;
+    border-right-width: 0;
+}
+
+.rounds li:last-child {
+    border-right-width: 1px;
+}
+
+.rounds li * {
+    vertical-align: middle;
+}
+
+.rounds .win {
+    background-color: hsl(120, 100%, 75%);
+}
+
+.rounds .loss {
+    background-color: hsl(0, 100%, 75%);
+}
+
+@keyframes next-pulse {
+  from {
+    background-position: 0%;
+  }
+
+  to {
+    background-position: 100%;
+  }
+}
+
+.rounds .next button {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-width: 0;
+    margin: 0;
+    font: inherit;
+    display: block;
+    cursor: pointer;
+    box-shadow: -1px 0px 5px black;
+    background: grey;
+    background-size: 150% auto;
+    animation: 2s next-pulse infinite alternate;
+}
+
+.rounds .win:nth-last-child(2) + .next button {
+    background: linear-gradient(to right, hsl(120, 100%, 75%), hsl(120, 0%, 75%));
+    background-size: 150% auto;
+}
+
+.rounds .loss:nth-last-child(2) + .next button {
+    background: linear-gradient(to right, hsl(0, 100%, 75%), hsl(0, 0%, 75%));
+    background-size: 150% auto;
 }
