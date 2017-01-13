@@ -131,6 +131,33 @@ getSelectedPlayer model =
         |> Maybe.andThen (\i -> Maybe.map2 (,) (Just i) (Array.get i model.us.players))
 
 
+historySummary : Equipment.Side -> List Equipment.Side -> List (Html Msg)
+historySummary us winners =
+    let
+        classes =
+            case us of
+                Equipment.CT ->
+                    ( "ct", "t" )
+
+                Equipment.T ->
+                    ( "t", "ct" )
+
+        wins =
+            winners
+                |> List.filter ((==) us)
+                |> List.length
+
+        losses =
+            (List.length winners) - wins
+    in
+        [ Html.li [ Html.Attributes.class "summary" ]
+            [ Html.span [ Html.Attributes.class (Tuple.first classes) ] [ Html.text (toString wins) ]
+            , Html.text "-"
+            , Html.span [ Html.Attributes.class (Tuple.second classes) ] [ Html.text (toString losses) ]
+            ]
+        ]
+
+
 showHistory : Equipment.Side -> List Equipment.Side -> List (Html Msg)
 showHistory us winners =
     let
@@ -140,12 +167,12 @@ showHistory us winners =
             else
                 ( "loss", "L" )
 
-        elementFor ( class, letter ) =
-            Html.li [ Html.Attributes.class class ] [ Html.span [] [ Html.text letter ] ]
+        elementFor i ( class, letter ) =
+            Html.li [ Html.Attributes.class class ] [ Html.span [] [ Html.text letter ], Html.small [] [ Html.text (toString (i + 1)) ] ]
     in
         winners
             |> List.map textFor
-            |> List.map elementFor
+            |> List.indexedMap elementFor
 
 
 nextRoundButton : List Equipment.Side -> List (Html Msg)
@@ -185,7 +212,8 @@ view model =
         Html.div []
             [ Html.div [ Html.Attributes.class "history" ]
                 [ Html.ul [ Html.Attributes.class "rounds" ]
-                    ((showHistory model.us.side model.roundWinners)
+                    ((historySummary model.us.side model.roundWinners)
+                        ++ (showHistory model.us.side model.roundWinners)
                         ++ (nextRoundButton model.roundWinners)
                     )
                 ]

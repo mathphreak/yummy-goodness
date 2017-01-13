@@ -201,9 +201,17 @@ body {
 }
 
 .playerName.ct {
-    color: #4F9EDE;
+    color: hsl(207, 68%, 59%);
 }
 
 .playerName.t {
-    color: #C7A247;
+    color: hsl(43, 53%, 53%);
+}
+
+.summary .ct {
+    color: hsl(207, 60%, 40%);
+}
+
+.summary .t {
+    color: hsl(43, 60%, 40%);
 }
