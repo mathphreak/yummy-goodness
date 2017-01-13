@@ -14,10 +14,10 @@ import Player exposing (Player, Msg)
 lineAtAngle : Float -> Html msg
 lineAtAngle angle =
     line
-        [ x1 (toString (50 + 50 * cos angle))
-        , y1 (toString (50 + 50 * sin angle))
-        , x2 (toString (50 + 50 * cos (angle + pi)))
-        , y2 (toString (50 + 50 * sin (angle + pi)))
+        [ x1 (toString (60 + 60 * cos angle))
+        , y1 (toString (60 + 60 * sin angle))
+        , x2 (toString (60 + 60 * cos (angle + pi)))
+        , y2 (toString (60 + 60 * sin (angle + pi)))
         , stroke "#808080"
         ]
         []
@@ -36,25 +36,25 @@ wedge count idx top bottom msg topEnabled bottomEnabled =
             (2 * pi * ((toFloat (idx * 2) - 1) / (toFloat count * 2))) + pi
 
         startX =
-            toString (50 + 50 * cos startAngle)
+            toString (60 + 60 * cos startAngle)
 
         startY =
-            toString (50 + 50 * sin startAngle)
+            toString (60 + 60 * sin startAngle)
 
         midX =
-            toString (50 + 30 * cos midAngle)
+            toString (60 + 38 * cos midAngle)
 
         midY1 =
-            toString (47 + 30 * sin midAngle)
+            toString (57 + 38 * sin midAngle)
 
         midY2 =
-            toString (53 + 30 * sin midAngle)
+            toString (63 + 38 * sin midAngle)
 
         endX =
-            toString (50 + 50 * cos endAngle)
+            toString (60 + 60 * cos endAngle)
 
         endY =
-            toString (50 + 50 * sin endAngle)
+            toString (60 + 60 * sin endAngle)
 
         linkAttributes =
             if msg /= Nothing && topEnabled then
@@ -86,7 +86,7 @@ wedge count idx top bottom msg topEnabled bottomEnabled =
                 "red"
     in
         a (linkAttributes ++ eventAttributes)
-            [ Svg.path [ d ("M 50 50 L " ++ startX ++ " " ++ startY ++ " A 50 50 0 0 0 " ++ endX ++ " " ++ endY ++ " L 50 50 z"), fill "black" ] []
+            [ Svg.path [ d ("M 60 60 L " ++ startX ++ " " ++ startY ++ " A 60 60 0 0 0 " ++ endX ++ " " ++ endY ++ " L 60 60 z"), fill "black" ] []
             , text_ [ x midX, y midY1, fill topColor, textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text top ]
             , text_ [ x midX, y midY2, fill bottomColor, textAnchor "middle", fontSize "5px", dominantBaseline "middle" ] [ text bottom ]
             ]
@@ -115,11 +115,11 @@ center backMsg team =
                     []
 
                 _ ->
-                    [ text_ [ x "50", y "50", fill "white", textAnchor "middle", dominantBaseline "middle", fontSize "4px" ] [ text "BACK" ] ]
+                    [ text_ [ x "60", y "60", fill "white", textAnchor "middle", dominantBaseline "middle", fontSize "4px" ] [ text "BACK" ] ]
     in
         a clickCenterAction
-            ([ circle [ cx "50", cy "50", r "10", fill "#FFFFFF" ] []
-             , circle [ cx "50", cy "50", r "7.5", fill teamColor ] []
+            ([ circle [ cx "60", cy "60", r "10", fill "#FFFFFF" ] []
+             , circle [ cx "60", cy "60", r "7.5", fill teamColor ] []
              ]
                 ++ centerLabel
             )
@@ -146,7 +146,7 @@ viewSix backMsg msg canPurchase team inv =
         wedgeFor item =
             wedge 6 item.index item.cost item.name item.action item.enabled True
     in
-        svg [ viewBox "0 0 100 100", width "300px" ]
+        svg [ viewBox "0 0 120 120", width "300px" ]
             ((List.map wedgeFor items)
                 ++ [ lineAtAngle (pi / 6)
                    , lineAtAngle (3 * pi / 6)
@@ -183,7 +183,7 @@ viewFour backMsg msg canPurchase team hasVest inv =
         wedgeFor item =
             wedge 4 item.index item.cost item.name item.action item.enabled True
     in
-        svg [ viewBox "0 0 100 100", width "300px" ]
+        svg [ viewBox "0 0 120 120", width "300px" ]
             ((List.map wedgeFor items)
                 ++ [ lineAtAngle (pi / 4)
                    , lineAtAngle (3 * pi / 4)
@@ -211,7 +211,7 @@ viewMenu msg canPurchase team =
         buildWedge i m =
             wedge 6 (i + 1) "" (Equipment.submenuName m) (Just (msg m)) True (anyAffordable m)
     in
-        svg [ viewBox "0 0 100 100", width "300px" ]
+        svg [ viewBox "0 0 120 120", width "300px" ]
             ((List.indexedMap buildWedge (.submenus Equipment.lists))
                 ++ [ lineAtAngle (pi / 6)
                    , lineAtAngle (3 * pi / 6)
