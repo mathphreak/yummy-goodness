@@ -23,6 +23,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Simulate rounds of game (UI: ☹️)
     - In each matchup, one player kills the other while taking no damage
     - This happens five times per round but skips if one player is dead
+    - Weapon damage exists
     - Round win/loss bonus exists
     - Weapon kill rewards are a thing
 
@@ -37,10 +38,10 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - Enemies buy things competently
     - Players don't always do what you say
 - Simulate rounds of game
-    - Weapon damage exists
     - Armor is a thing
     - Matchups are better
     - Lose or win rounds based on real things
     - Switch sides at halftime
     - Pick up enemy weapons sometimes
+    - Accuracy and recoil are real
 - Appease the gods of line length and dead code

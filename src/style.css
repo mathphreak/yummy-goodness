@@ -71,3 +71,11 @@ body {
 .player:first-child h2 {
     margin-top: 0;
 }
+
+.menus {
+    position: fixed;
+    top: 0;
+    left: calc(50% - 150px);
+    width: 300px;
+    text-align: center;
+}

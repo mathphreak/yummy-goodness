@@ -30,6 +30,7 @@ type alias Model =
     { us : Team
     , them : Team
     , selectedPlayer : Maybe Int
+    , log : List String
     }
 
 
@@ -39,6 +40,7 @@ init =
         (Team.buildTeam Equipment.CT Array.empty)
         (Team.buildTeam Equipment.CT Array.empty)
         Nothing
+        []
     , Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool)
     )
 
@@ -52,7 +54,7 @@ type Msg
     | UsMsg Team.Msg
     | SelectPlayer Int
     | BeginSimulation
-    | EndSimulation ( Team, Team )
+    | EndSimulation ( Team, Team, List String )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,7 +80,7 @@ update msg model =
                 theirNames =
                     Array.slice 5 10 names
             in
-                ( Model (Team.buildTeam ourSide ourNames) (Team.buildTeam theirSide theirNames) Nothing
+                ( Model (Team.buildTeam ourSide ourNames) (Team.buildTeam theirSide theirNames) Nothing []
                 , Cmd.none
                 )
 
@@ -95,8 +97,8 @@ update msg model =
         BeginSimulation ->
             ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them )) )
 
-        EndSimulation ( us, them ) ->
-            ( { model | us = us, them = them, selectedPlayer = Nothing }, Cmd.none )
+        EndSimulation ( us, them, log ) ->
+            ( { model | us = us, them = them, selectedPlayer = Nothing, log = List.reverse log }, Cmd.none )
 
 
 
@@ -157,6 +159,7 @@ view model =
                     ]
                 ]
             , Html.button [ Html.Attributes.type_ "button", Html.Events.onClick BeginSimulation ] [ Html.text "Simulate!" ]
+            , Html.ul [] (List.map (\l -> Html.li [] [ Html.text l ]) model.log)
             , Html.node "link"
                 [ Html.Attributes.rel "stylesheet"
                 , Html.Attributes.href "style.css"
