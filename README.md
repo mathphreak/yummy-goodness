@@ -25,7 +25,7 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - This happens anywhere from 3 to 20 times per round but skips if one player is dead
     - Weapon damage exists
     - Armor is a thing
-    - Round win/loss bonus exists
+    - Round win/loss bonus exists and increases for losing streaks
     - Weapon kill rewards are a thing
     - Remember who won which round (UI: 🙂🙂)
     - Show kill feed (UI: 🙂 with images and colors blatantly stolen from http://tools.dathost.net/killfeed-generator/)
@@ -35,9 +35,8 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Explain some things
 - Enemies buy things competently
 - Simulate rounds of game
-    - Matchups are better
-    - Lose or win rounds based on real things
-    - Update round bonus based on losing streak
+    - Matchups are better handled
+    - Plant and defuse the bomb
     - End game after 15 rounds (switching sides is too complicated)
     - Pick up enemy weapons sometimes
     - Accuracy and recoil are real

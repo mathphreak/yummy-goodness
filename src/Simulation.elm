@@ -5,6 +5,7 @@ import Equipment exposing (Equipment)
 import Team exposing (Team)
 import Array exposing (Array)
 import Maybe.Extra
+import List.Extra
 import Random exposing (..)
 import Random.Extra exposing (..)
 import Random.List
@@ -62,8 +63,8 @@ makeState ( us, them ) =
         ( simTeam us, simTeam them, [] )
 
 
-breakState : SimulationState -> ( Team, Team, KillFeed, Equipment.Side )
-breakState ( simUs, simThem, feed ) =
+breakState : ( Equipment.Side, Int ) -> SimulationState -> ( Team, Team, KillFeed, Equipment.Side )
+breakState ( lastWinner, winStreak ) ( simUs, simThem, feed ) =
     let
         breakPlayer : Int -> SimulatedPlayer -> Player
         breakPlayer bonus p =
@@ -72,9 +73,9 @@ breakState ( simUs, simThem, feed ) =
                     p.player
             in
                 if p.health > 0 then
-                    { player | money = player.money + bonus }
+                    { player | money = clamp 0 16000 (player.money + bonus) }
                 else
-                    Player.dead { player | money = player.money + bonus }
+                    Player.dead { player | money = clamp 0 16000 (player.money + bonus) }
 
         countAlive : SimulatedTeam -> Int
         countAlive team =
@@ -99,8 +100,10 @@ breakState ( simUs, simThem, feed ) =
                 reward =
                     if t.side == winningTeam then
                         3250
-                    else
+                    else if t.side == lastWinner then
                         1400
+                    else
+                        clamp 1400 3400 (1400 + 500 * winStreak)
             in
                 Team t.side (Array.map (breakPlayer reward) t.players) Array.empty
     in
@@ -329,17 +332,42 @@ runEnemyAI theirTeam =
         { theirTeam | players = players }
 
 
-simulate : ( Team, Team ) -> Generator ( Team, Team, KillFeed, Equipment.Side )
-simulate ( ourTeam, theirTeam ) =
+extractStreak : List Equipment.Side -> ( Equipment.Side, Int )
+extractStreak winners =
+    let
+        rWinners =
+            List.reverse winners
+
+        lastWinner =
+            List.head rWinners
+
+        getStreak lW =
+            rWinners
+                |> List.Extra.takeWhile ((==) lW)
+                |> List.length
+    in
+        case lastWinner of
+            Just lW ->
+                ( lW, getStreak lW )
+
+            Nothing ->
+                ( Equipment.CT, 0 )
+
+
+simulate : ( Team, Team, List Equipment.Side ) -> Generator ( Team, Team, KillFeed, Equipment.Side )
+simulate ( ourTeam, theirTeam, winners ) =
     let
         runStepsFrom n =
             List.repeat n (andThen simulateStep)
                 |> List.foldr (>>) identity
+
+        winningStreak =
+            extractStreak winners
     in
         int 3 20
             |> andThen
                 (\n ->
                     runStepsFrom n
                         (constant (makeState ( ourTeam, runEnemyAI theirTeam )))
-                        |> map breakState
+                        |> map (breakState winningStreak)
                 )

@@ -98,7 +98,7 @@ update msg model =
             ( { model | selectedPlayer = Just i }, Cmd.none )
 
         BeginSimulation ->
-            ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them )) )
+            ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them, model.roundWinners )) )
 
         EndSimulation ( us, them, killFeed, winner ) ->
             ( { model
