@@ -333,10 +333,15 @@ runEnemyAI theirTeam =
 
 simulate : ( Team, Team ) -> Generator ( Team, Team, Log )
 simulate ( ourTeam, theirTeam ) =
-    makeState ( ourTeam, runEnemyAI theirTeam )
-        |> simulateStep
-        |> andThen simulateStep
-        |> andThen simulateStep
-        |> andThen simulateStep
-        |> andThen simulateStep
-        |> map breakState
+    let
+        runStepsFrom n =
+            List.repeat n (andThen simulateStep)
+                |> List.foldr (>>) identity
+    in
+        int 3 20
+            |> andThen
+                (\n ->
+                    runStepsFrom n
+                        (constant (makeState ( ourTeam, runEnemyAI theirTeam )))
+                        |> map breakState
+                )

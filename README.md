@@ -21,8 +21,8 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - Make enemies buy things too
 - Make players drop weapons (UI: ☹️)
 - Simulate rounds of game (UI: ☹️)
-    - In each matchup, one player kills the other while taking no damage
-    - This happens five times per round but skips if one player is dead
+    - In each matchup, players shoot at each other as fast as their most primary weapons will allow
+    - This happens anywhere from 3 to 20 times per round but skips if one player is dead
     - Weapon damage exists
     - Armor is a thing
     - Round win/loss bonus exists
