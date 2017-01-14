@@ -32,9 +32,8 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 
 ## TODO
 
-- Enemies buy things more competently
 - Simulate rounds of game
-    - Matchups are better handled
     - Plant and defuse the bomb
-    - Pick up enemy weapons sometimes
+    - Shots hit head/body/legs
+    - Grenades aren't useless
 - Appease the gods of line length and dead code

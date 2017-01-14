@@ -320,9 +320,45 @@ simulateStep state =
         |> andThen (grabAndRunMatchup state)
 
 
+type alias SlotData =
+    ( Bool, Bool )
+
+
 aiEnemyPurchase : Player -> Player
 aiEnemyPurchase them =
     let
+        canPurchase p e =
+            (p.primary == Just e)
+                || (p.secondary == Just e)
+                || Player.playerCanPurchaseEquipment p e
+
+        doPurchase p e =
+            if (p.primary == Just e) || (p.secondary == Just e) then
+                p
+            else
+                Player.update (Player.Purchase e) p
+
+        purchaseWeapon : Player -> Player
+        purchaseWeapon p =
+            if canPurchase p Equipment.AWP then
+                doPurchase p Equipment.AWP
+            else if canPurchase p Equipment.AK47 then
+                doPurchase p Equipment.AK47
+            else if canPurchase p Equipment.M4A4 then
+                doPurchase p Equipment.M4A4
+            else if canPurchase p Equipment.XM1014 then
+                doPurchase p Equipment.XM1014
+            else if canPurchase p Equipment.MAC10 then
+                doPurchase p Equipment.MAC10
+            else if canPurchase p Equipment.MP9 then
+                doPurchase p Equipment.MP9
+            else if canPurchase p Equipment.Tec9 then
+                doPurchase p Equipment.Tec9
+            else if canPurchase p Equipment.Deagle then
+                doPurchase p Equipment.Deagle
+            else
+                p
+
         purchaseIfPossible : Equipment -> Player -> Player
         purchaseIfPossible e p =
             if (Player.playerCanPurchaseEquipment p e) then
@@ -333,12 +369,11 @@ aiEnemyPurchase them =
         them
             |> purchaseIfPossible Equipment.VestHelmet
             |> purchaseIfPossible Equipment.Vest
-            |> purchaseIfPossible Equipment.Deagle
-            |> purchaseIfPossible Equipment.XM1014
-            |> purchaseIfPossible Equipment.AK47
-            |> purchaseIfPossible Equipment.M4A4
-            |> purchaseIfPossible Equipment.AWP
+            |> purchaseWeapon
             |> purchaseIfPossible Equipment.Smoke
+            |> purchaseIfPossible Equipment.Flash
+            |> purchaseIfPossible Equipment.Flash
+            |> purchaseIfPossible Equipment.HENade
 
 
 runEnemyAI : Team -> Team
