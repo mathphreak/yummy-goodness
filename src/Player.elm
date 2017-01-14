@@ -38,16 +38,7 @@ type alias Player =
 
 newPlayer : Side -> String -> Player
 newPlayer side name =
-    let
-        pistol =
-            case side of
-                Equipment.CT ->
-                    Equipment.USPS
-
-                Equipment.T ->
-                    Equipment.Glock
-    in
-        Player 800 side (Just pistol) Nothing [] [] Nothing name []
+    Player 800 side (Just (Equipment.defaultPistol side)) Nothing [] [] Nothing name []
 
 
 dead : Player -> Player
@@ -160,7 +151,9 @@ playerCanUseEquipment p e =
 
 playerCanPurchaseEquipment : Player -> Equipment -> Bool
 playerCanPurchaseEquipment p e =
-    if (Equipment.cost e) > p.money then
+    if (e == Equipment.VestHelmet && List.member Equipment.Vest p.gear && p.money >= 350) then
+        True
+    else if (Equipment.cost e) > p.money then
         False
     else if (p.primary == Just e) then
         False

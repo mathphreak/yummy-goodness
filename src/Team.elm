@@ -33,7 +33,7 @@ buildTeam side names =
             names
                 |> Array.map (newPlayer side)
     in
-        Team side players Array.empty
+        Team side players (Array.repeat 1 (Equipment.defaultPistol side))
 
 
 

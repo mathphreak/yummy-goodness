@@ -28,10 +28,10 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
     - The team with more players alive at the end wins; ties go to CTs
     - You can see who won which round, and you get more money if you're on a losing streak (UI: 🙂)
     - See who killed who with what last round (UI: 🙂 with images and colors blatantly stolen from http://tools.dathost.net/killfeed-generator/)
+- There's a tutorial
 
 ## TODO
 
-- Explain some things
 - Enemies buy things more competently
 - Simulate rounds of game
     - Matchups are better handled

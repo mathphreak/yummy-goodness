@@ -1,8 +1,9 @@
 module Main exposing (..)
 
-import Html exposing (Html)
-import Html.Attributes
-import Html.Events
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import HtmlExtra exposing (..)
 import Array exposing (Array)
 import Player exposing (Player)
 import Equipment
@@ -12,10 +13,11 @@ import BotNames
 import BuyMenu
 import Simulation
 import KillFeed exposing (KillFeed)
+import Tutorial
 
 
 main =
-    Html.program
+    program
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -30,7 +32,7 @@ main =
 type alias Model =
     { us : Team
     , them : Team
-    , selectedPlayer : Maybe Int
+    , selectedPlayer : Int
     , killFeed : KillFeed
     , roundWinners : List Equipment.Side
     }
@@ -41,7 +43,7 @@ init =
     ( Model
         (Team.buildTeam Equipment.CT Array.empty)
         (Team.buildTeam Equipment.CT Array.empty)
-        Nothing
+        0
         []
         []
     , Random.generate RngLoad (Random.map2 (,) (BotNames.pickNames 10) Random.bool)
@@ -84,7 +86,7 @@ update msg model =
                 theirNames =
                     Array.slice 5 10 names
             in
-                ( Model (Team.buildTeam ourSide ourNames) (Team.buildTeam theirSide theirNames) Nothing [] []
+                ( Model (Team.buildTeam ourSide ourNames) (Team.buildTeam theirSide theirNames) 0 [] []
                 , Cmd.none
                 )
 
@@ -96,7 +98,7 @@ update msg model =
                 ( { model | us = Team.update msg us }, Cmd.none )
 
         SelectPlayer i ->
-            ( { model | selectedPlayer = Just i }, Cmd.none )
+            ( { model | selectedPlayer = i }, Cmd.none )
 
         BeginSimulation ->
             ( model, Random.generate EndSimulation (Simulation.simulate ( model.us, model.them, model.roundWinners )) )
@@ -105,7 +107,6 @@ update msg model =
             ( { model
                 | us = us
                 , them = them
-                , selectedPlayer = Nothing
                 , killFeed = killFeed
                 , roundWinners = model.roundWinners ++ [ winner ]
               }
@@ -131,8 +132,8 @@ subscriptions model =
 
 getSelectedPlayer : Model -> Maybe ( Int, Player )
 getSelectedPlayer model =
-    model.selectedPlayer
-        |> Maybe.andThen (\i -> Maybe.map2 (,) (Just i) (Array.get i model.us.players))
+    Array.get model.selectedPlayer model.us.players
+        |> Maybe.map (\p -> ( model.selectedPlayer, p ))
 
 
 historySummary : Equipment.Side -> List Equipment.Side -> List (Html Msg)
@@ -154,10 +155,10 @@ historySummary us winners =
         losses =
             (List.length winners) - wins
     in
-        [ Html.li [ Html.Attributes.class "summary" ]
-            [ Html.span [ Html.Attributes.class (Tuple.first classes) ] [ Html.text (toString wins) ]
-            , Html.text "-"
-            , Html.span [ Html.Attributes.class (Tuple.second classes) ] [ Html.text (toString losses) ]
+        [ li [ class "summary", Tutorial.startOnClick ]
+            [ span [ class (Tuple.first classes) ] [ text (toString wins) ]
+            , text "-"
+            , span [ class (Tuple.second classes) ] [ text (toString losses) ]
             ]
         ]
 
@@ -171,8 +172,8 @@ showHistory us winners =
             else
                 ( "loss", "L" )
 
-        elementFor i ( class, letter ) =
-            Html.li [ Html.Attributes.class class ] [ Html.span [] [ Html.text letter ], Html.small [] [ Html.text (toString (i + 1)) ] ]
+        elementFor i ( class_, letter ) =
+            li [ class class_ ] [ span [] [ text letter ], small [] [ text (toString (i + 1)) ] ]
     in
         winners
             |> List.map textFor
@@ -182,8 +183,8 @@ showHistory us winners =
 nextRoundButton : List Equipment.Side -> List (Html Msg)
 nextRoundButton winners =
     if (List.length winners < 15) then
-        [ Html.li [ Html.Attributes.class "next" ]
-            [ Html.button [ Html.Attributes.type_ "button", Html.Events.onClick BeginSimulation ] [ Html.text "NEXT" ]
+        [ li [ class "next" ]
+            [ button [ type_ "button", onClick BeginSimulation ] [ text "NEXT" ]
             ]
         ]
     else
@@ -192,8 +193,8 @@ nextRoundButton winners =
 
 historyPanel : Model -> Html Msg
 historyPanel model =
-    Html.div [ Html.Attributes.class "history" ]
-        [ Html.ul [ Html.Attributes.class "rounds" ]
+    div [ class "history" ]
+        [ ul [ class "rounds" ]
             ((historySummary model.us.side model.roundWinners)
                 ++ (showHistory model.us.side model.roundWinners)
                 ++ (nextRoundButton model.roundWinners)
@@ -210,7 +211,7 @@ menuPanel model =
                     [ BuyMenu.buyMenuFor (\a -> (UsMsg <| Team.PlayerMessage i <| a)) p ]
 
                 Nothing ->
-                    [ Html.p [] [ Html.text "Select a player!" ] ]
+                    [ p [] [ text "Select a player!" ] ]
 
         actions =
             case (getSelectedPlayer model) of
@@ -220,32 +221,31 @@ menuPanel model =
                 Nothing ->
                     []
     in
-        Html.div [ Html.Attributes.class "menus" ] (menu ++ actions)
+        div [ class "menus" ] (menu ++ actions)
 
 
 uiPanel : Model -> Html Msg
 uiPanel model =
     let
         pickUp =
-            model.selectedPlayer
-                |> Maybe.map (\i -> (\a -> UsMsg <| Team.PickUp i a))
+            (\a -> UsMsg <| Team.PickUp model.selectedPlayer a)
     in
-        Html.div [ Html.Attributes.class "ui inGame" ]
-            [ Html.div [ Html.Attributes.class "us" ]
-                [ Html.h1 []
-                    [ Html.text "US ("
-                    , Html.span [ Html.Attributes.class (String.toLower (toString model.us.side)) ]
-                        [ Html.text (toString model.us.side) ]
-                    , Html.text ")"
+        div [ class "ui inGame" ]
+            [ div [ class "us" ]
+                [ h1 []
+                    [ text "US ("
+                    , span [ class (String.toLower (toString model.us.side)) ]
+                        [ text (toString model.us.side) ]
+                    , text ")"
                     ]
-                , Team.view (Just SelectPlayer) pickUp model.selectedPlayer model.us
+                , Team.view (Just SelectPlayer) (Just pickUp) (Just model.selectedPlayer) model.us
                 ]
-            , Html.div [ Html.Attributes.class "them" ]
-                [ Html.h1 []
-                    [ Html.text "THEM ("
-                    , Html.span [ Html.Attributes.class (String.toLower (toString model.them.side)) ]
-                        [ Html.text (toString model.them.side) ]
-                    , Html.text ")"
+            , div [ class "them" ]
+                [ h1 []
+                    [ text "THEM ("
+                    , span [ class (String.toLower (toString model.them.side)) ]
+                        [ text (toString model.them.side) ]
+                    , text ")"
                     ]
                 , Team.view Nothing Nothing Nothing model.them
                 ]
@@ -271,10 +271,10 @@ gameOverView model =
             else
                 "You lost."
     in
-        [ Html.div [ Html.Attributes.class "ui afterGame" ]
-            [ Html.h1 [] [ Html.text "Game Over!" ]
-            , Html.h2 [] [ Html.text message ]
-            , Html.button [ Html.Events.onClick Reset ] [ Html.text "Restart?" ]
+        [ div [ class "ui afterGame" ]
+            [ h1 [] [ text "Game Over!" ]
+            , h2 [] [ text message ]
+            , button [ onClick Reset ] [ text "Restart?" ]
             ]
         ]
 
@@ -291,10 +291,23 @@ view model =
             else
                 gameInProgressView
     in
-        Html.div []
-            ([ historyPanel model
+        div []
+            ([ script
+                [ src "https://rawgit.com/usablica/intro.js/master/intro.js" {- , integrity "sha256-UocMbqHWrfuSkpVXznmcJ8f3sak/xJGVgIziKyleHsI=" -}
+                , crossorigin "anonymous"
+                , Tutorial.startOnLoad
+                ]
+                []
+             , link
+                [ rel "stylesheet"
+                , href "https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.4.0/introjs.min.css" {- , integrity "sha256-xqkZ4mAs490xmDCAkpdxs8gHShKLKAoqpuxuxx7PMhQ=" -}
+                , crossorigin "anonymous"
+                ]
+                []
+             , Tutorial.script
+             , link [ rel "stylesheet", href "style.css" ] []
+             , historyPanel model
              , KillFeed.view model.killFeed
-             , Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
              ]
                 ++ subview model
             )

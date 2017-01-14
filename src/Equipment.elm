@@ -130,6 +130,16 @@ lists =
     }
 
 
+defaultPistol : Side -> Equipment
+defaultPistol s =
+    case s of
+        CT ->
+            USPS
+
+        T ->
+            Glock
+
+
 listFor : Submenu -> List Equipment
 listFor m =
     case m of

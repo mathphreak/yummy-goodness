@@ -14,7 +14,7 @@ svg a.link {
 
 .player h2 {
     font-weight: normal;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .player p {
@@ -52,6 +52,7 @@ svg a.link {
 body {
     font-family: "Montserrat", sans-serif;
     font-size: 16px;
+    height: unset;
 }
 
 .inventory {
@@ -61,7 +62,7 @@ body {
 
 .inventory li {
     list-style-type: none;
-    height: 19px;
+    min-height: 19px;
 }
 
 .inventory span {
@@ -76,12 +77,12 @@ body {
     display: block;
 }
 
-.player:first-child h2 {
-    margin-top: 0;
+.player:not(:first-child) {
+    margin-top: 1em;
 }
 
 .menus {
-    position: fixed;
+    position: absolute;
     top: 2em;
     left: calc(50% - 150px);
     width: 300px;
@@ -90,7 +91,7 @@ body {
 
 .history {
     height: 2em;
-    position: fixed;
+    position: absolute;
     top: 0;
     width: 100%;
 }
@@ -164,7 +165,7 @@ body {
 }
 
 .killFeed {
-    position: fixed;
+    position: absolute;
     right: 0.5em;
     top: 0.5em;
     text-align: right;
@@ -223,4 +224,11 @@ body {
 
 .playerName.t {
     color: hsl(43, 53%, 53%);
+}
+
+.introjs-helperNumberLayer {
+    top: unset;
+    bottom: -16px;
+    left: unset;
+    right: -16px;
 }
