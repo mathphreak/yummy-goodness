@@ -115,11 +115,11 @@ center backMsg team =
                     []
 
                 _ ->
-                    [ text_ [ x "60", y "60", fill "white", textAnchor "middle", dominantBaseline "middle", fontSize "4px" ] [ text "BACK" ] ]
+                    [ text_ [ x "60", y "60", fill "white", textAnchor "middle", dominantBaseline "middle", fontSize "5px" ] [ text "BACK" ] ]
     in
         a clickCenterAction
-            ([ circle [ cx "60", cy "60", r "10", fill "#FFFFFF" ] []
-             , circle [ cx "60", cy "60", r "7.5", fill teamColor ] []
+            ([ circle [ cx "60", cy "60", r "15", fill "#FFFFFF" ] []
+             , circle [ cx "60", cy "60", r "12", fill teamColor ] []
              ]
                 ++ centerLabel
             )
