@@ -232,11 +232,21 @@ uiPanel model =
     in
         Html.div [ Html.Attributes.class "ui inGame" ]
             [ Html.div [ Html.Attributes.class "us" ]
-                [ Html.h1 [] [ Html.text ("US (" ++ (toString model.us.side) ++ ")") ]
+                [ Html.h1 []
+                    [ Html.text "US ("
+                    , Html.span [ Html.Attributes.class (String.toLower (toString model.us.side)) ]
+                        [ Html.text (toString model.us.side) ]
+                    , Html.text ")"
+                    ]
                 , Team.view (Just SelectPlayer) pickUp model.selectedPlayer model.us
                 ]
             , Html.div [ Html.Attributes.class "them" ]
-                [ Html.h1 [] [ Html.text ("THEM (" ++ (toString model.them.side) ++ ")") ]
+                [ Html.h1 []
+                    [ Html.text "THEM ("
+                    , Html.span [ Html.Attributes.class (String.toLower (toString model.them.side)) ]
+                        [ Html.text (toString model.them.side) ]
+                    , Html.text ")"
+                    ]
                 , Team.view Nothing Nothing Nothing model.them
                 ]
             ]

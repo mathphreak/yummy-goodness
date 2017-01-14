@@ -185,10 +185,10 @@ simulateTick ( simMe, simYou, _ ) =
                 |> zip2 stats
                 |> Tuple2.mapBoth calculateDamage
 
-        winCooldown =
+        firedCooldown =
             stats |> Tuple2.mapBoth .ticksBetweenShots
 
-        lossCooldown =
+        heldFireCooldown =
             oldCooldown |> Tuple2.mapBoth (\c -> clamp 0 c (c - 1))
 
         calculateReward ( stats, ( damage, enemyHealth ) ) =
@@ -203,53 +203,71 @@ simulateTick ( simMe, simYou, _ ) =
                 |> zip2 stats
                 |> Tuple2.mapBoth calculateReward
 
-        wonSelf =
+        firedSelf =
             reward
                 |> zip2 self
                 |> Tuple2.mapBoth (\( s, r ) -> { s | money = s.money + r })
 
-        wonSim =
-            wonSelf
-                |> zip2 winCooldown
+        firedSim =
+            firedSelf
+                |> zip2 firedCooldown
                 |> zip2 simSelf
                 |> Tuple2.mapBoth (\( s, ( c, p ) ) -> { s | player = p, cooldownLeft = c })
 
-        whiffSim =
+        didNothingSim =
             simSelf
-                |> zip2 lossCooldown
+                |> zip2 heldFireCooldown
                 |> Tuple2.mapBoth (\( c, s ) -> { s | cooldownLeft = c })
 
-        lostSim =
+        hitSim =
             zip2 health (Tuple2.swap damage)
-                |> zip2 (zip2 simSelf lossCooldown)
+                |> zip2 (zip2 simSelf heldFireCooldown)
                 |> Tuple2.mapBoth (\( ( sS, lC ), ( h, d ) ) -> { sS | health = h - d, cooldownLeft = lC })
 
-        nobodyWins =
-            ( my whiffSim, your whiffSim, Nothing )
+        nothingHappens =
+            ( my didNothingSim, your didNothingSim, Nothing )
 
-        iWin =
+        iHit =
             if (my oldCooldown) > 0 then
-                nobodyWins
+                nothingHappens
             else
-                ( my wonSim
-                , your lostSim
+                ( my firedSim
+                , your hitSim
                 , Just (KillFeedEntry me you (my gun))
                 )
 
-        youWin =
-            if (your oldCooldown) > 0 then
-                nobodyWins
+        iMissed =
+            if (my oldCooldown) > 0 then
+                nothingHappens
             else
-                ( my lostSim
-                , your wonSim
+                ( my firedSim
+                , your didNothingSim
+                , Nothing
+                )
+
+        youHit =
+            if (your oldCooldown) > 0 then
+                nothingHappens
+            else
+                ( my hitSim
+                , your firedSim
                 , Just (KillFeedEntry you me (your gun))
                 )
 
+        youMissed =
+            if (your oldCooldown) > 0 then
+                nothingHappens
+            else
+                ( my didNothingSim
+                , your firedSim
+                , Nothing
+                )
+
         choices =
-            [ iWin, nobodyWins, youWin ]
+            [ iHit, iMissed, nothingHappens, youHit, youMissed ]
     in
         Random.List.choose choices
-            |> map (\( result, _ ) -> (Maybe.withDefault nobodyWins result))
+            |> map (\( result, _ ) -> (Maybe.withDefault nothingHappens result))
 
 
 simulateMatchup : SimulatedMatchup -> Generator SimulatedMatchup

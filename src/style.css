@@ -207,18 +207,20 @@ body {
     padding-left: 3px;
 }
 
+.ct {
+    color: hsl(207, 30%, 40%);
+    fill: hsl(207, 30%, 30%);
+}
+
+.t {
+    color: hsl(43, 30%, 40%);
+    fill: hsl(43, 30%, 30%);
+}
+
 .playerName.ct {
     color: hsl(207, 68%, 59%);
 }
 
 .playerName.t {
     color: hsl(43, 53%, 53%);
-}
-
-.summary .ct {
-    color: hsl(207, 60%, 40%);
-}
-
-.summary .t {
-    color: hsl(43, 60%, 40%);
 }

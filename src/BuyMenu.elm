@@ -6,6 +6,7 @@ import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Equipment exposing (Equipment)
 import Player exposing (Player, Msg)
+import String
 
 
 -- VIEW
@@ -95,11 +96,8 @@ wedge count idx top bottom msg topEnabled bottomEnabled =
 center : Maybe msg -> Equipment.Side -> Html msg
 center backMsg team =
     let
-        teamColor =
-            if team == Equipment.CT then
-                "hsl(207, 30%, 30%)"
-            else
-                "hsl(45, 30%, 30%)"
+        teamClass =
+            String.toLower (toString team)
 
         clickCenterAction =
             case backMsg of
@@ -119,7 +117,7 @@ center backMsg team =
     in
         a clickCenterAction
             ([ circle [ cx "60", cy "60", r "15", fill "#FFFFFF" ] []
-             , circle [ cx "60", cy "60", r "12", fill teamColor ] []
+             , circle [ cx "60", cy "60", r "12", class teamClass ] []
              ]
                 ++ centerLabel
             )
