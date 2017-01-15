@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Yummy Goodness</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.4.0/introjs.min.css">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="main"></div>
+    <script src="app.js"></script>
+    <script src="https://rawgit.com/usablica/intro.js/master/intro.js"></script>
+    <script>
+        var node = document.getElementById('main');
+        var app = Elm.Main.embed(node);
+
+        function startIntro() {
+            var intro = introJs();
+            intro.setOptions({
+                steps: [
+                    {
+                        intro: 'Welcome to Yummy Goodness.'
+                    },
+                    {
+                        element: '.wedge',
+                        intro: 'Buy things.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.menus div',
+                        intro: 'Drop things.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.ground',
+                        intro: 'Pick things up.',
+                        position: 'top'
+                    },
+                    {
+                        element: '.player:not(.selected)',
+                        intro: 'Select players.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.next',
+                        intro: 'Start rounds.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.summary',
+                        intro: 'Win or lose after 15 rounds.',
+                        position: 'bottom'
+                    }
+                ]
+            });
+            intro.start();
+        }
+
+        function startIntroEventually() {
+            if (!window.introJs) {
+                setTimeout(startIntroEventually, 10);
+            } else if (!document.querySelector('.wedge')) {
+                setTimeout(startIntroEventually, 10);
+            } else {
+                startIntro();
+            }
+        }
+        startIntroEventually();
+    </script>
+</body>
+</html>

@@ -11,8 +11,18 @@ I've been wanting to learn Elm for a while now and I thought this was as good a 
 ## okay but seriously why did you call it that
 It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 
-## FEATURES
+## Build Process
+For a simple build, just run `elm-make src/Main.elm --output dist/app.js` and open `dist/index.html`.
 
+For the whole shebang:
+```sh
+npm install -g inliner
+elm-make --yes src/Main.elm --output dist/app.js
+mkdir out
+inliner dist/index.html > out/index.html
+```
+
+## FEATURES
 - Players have proper inventory (UI: 🙂)
 - Players are on teams (UI: 🙂)
 - Buy things with the actual CS:GO buy menu (UI: 🙂)
@@ -31,7 +41,6 @@ It's a reference to [this tutorial thing](https://youtu.be/DpXtRbggpQM?t=4m40s).
 - There's a tutorial
 
 ## TODO
-
 - Simulate rounds of game
     - Plant and defuse the bomb
     - Shots hit head/body/legs

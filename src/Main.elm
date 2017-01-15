@@ -13,7 +13,6 @@ import BotNames
 import BuyMenu
 import Simulation
 import KillFeed exposing (KillFeed)
-import Tutorial
 
 
 main =
@@ -155,7 +154,7 @@ historySummary us winners =
         losses =
             (List.length winners) - wins
     in
-        [ li [ class "summary", Tutorial.startOnClick ]
+        [ li [ class "summary" ]
             [ span [ class (Tuple.first classes) ] [ text (toString wins) ]
             , text "-"
             , span [ class (Tuple.second classes) ] [ text (toString losses) ]
@@ -292,21 +291,7 @@ view model =
                 gameInProgressView
     in
         div []
-            ([ script
-                [ src "https://rawgit.com/usablica/intro.js/master/intro.js" {- , integrity "sha256-UocMbqHWrfuSkpVXznmcJ8f3sak/xJGVgIziKyleHsI=" -}
-                , crossorigin "anonymous"
-                , Tutorial.startOnLoad
-                ]
-                []
-             , link
-                [ rel "stylesheet"
-                , href "https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.4.0/introjs.min.css" {- , integrity "sha256-xqkZ4mAs490xmDCAkpdxs8gHShKLKAoqpuxuxx7PMhQ=" -}
-                , crossorigin "anonymous"
-                ]
-                []
-             , Tutorial.script
-             , link [ rel "stylesheet", href "style.css" ] []
-             , historyPanel model
+            ([ historyPanel model
              , KillFeed.view model.killFeed
              ]
                 ++ subview model
