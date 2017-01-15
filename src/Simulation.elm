@@ -417,7 +417,7 @@ simulate ( ourTeam, theirTeam, winners ) =
         winningStreak =
             extractStreak winners
     in
-        int 3 20
+        int 15 20
             |> andThen
                 (\n ->
                     runStepsFrom n
