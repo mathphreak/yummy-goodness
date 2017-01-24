@@ -1,6 +1,8 @@
 # Yummy Goodness
 CS:GO's ingame economy system extracted into its own game for [@eevee's GAMES MADE QUICK???](https://itch.io/jam/games-made-quick)
 
+> ...like trying to open a cursed egyptian tomb - [@eevee](https://twitter.com/eevee/status/823806495917604866)
+
 ## but why?
 Game jams are cool and I want to participate in more of them.
 
